@@ -14,3 +14,14 @@ export const loginValidation = [
     min: 6,
   }),
 ];
+
+export const transactionCreateValidation = [
+  body("type", "Неверный тип транзакции").isString(),
+  body("shortDescription", "Введите краткое описание транзакции").isString(),
+  body("amount", "Введите сумму транзакции").isFloat(),
+  body("check", "Выберите счет").isString(),
+  body("date", "Выберите дату транзакции").isString(),
+  body("fullDescription", "Не верный формат записи описания")
+    .optional()
+    .isString(),
+];
