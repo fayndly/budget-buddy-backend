@@ -51,7 +51,7 @@ app.post(
   handleValidationErrors,
   TransactionController.create
 );
-// app.get("/transactions", checkAuth, TransactionController.getAll);
+app.get("/transactions", checkAuth, TransactionController.getAll);
 
 app.listen(process.env.PORT, (err) => {
   if (err) {

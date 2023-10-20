@@ -22,7 +22,7 @@ const TransactionSchema = new mongoose.Schema(
     },
     date: {
       type: Date,
-      // default: new Date.now()
+      default: Date.now(),
     },
     fullDescription: String,
   },

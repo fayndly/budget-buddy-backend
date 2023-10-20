@@ -9,7 +9,8 @@ export const create = async (req, res) => {
       amount: req.body.amount,
       check: req.body.check,
       category: req.body.category,
-      date: req.body.date,
+      // date: req.body.date,
+      date: Date.now(),
       fullDescription: req.body.fullDescription,
     });
 
@@ -26,15 +27,14 @@ export const create = async (req, res) => {
   }
 };
 
-// export const getAll = async (req, res) => {
-//   try {
-//     const transactions = await TransactionModel.find({ userId: req.userId });
-//     return res.json(transactions);
-//     // return res.json({ TransactionModel: doc });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Не удалось найти транзакции",
-//     });
-//   }
-// };
+export const getAll = async (req, res) => {
+  try {
+    const transactions = await TransactionModel.find({ userId: req.userId });
+    return res.json(transactions);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось найти транзакции",
+    });
+  }
+};
