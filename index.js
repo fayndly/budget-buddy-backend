@@ -6,7 +6,7 @@ dotenv.config();
 
 import mongoose from "mongoose";
 
-import { signupValidation } from "./Validations/index.js";
+import { signupValidation, loginValidation } from "./Validations/index.js";
 
 import { handleValidationErrors } from "./Utils/index.js";
 
@@ -29,6 +29,12 @@ app.post(
   signupValidation,
   handleValidationErrors,
   UserController.signup
+);
+app.post(
+  "/auth/login",
+  loginValidation,
+  handleValidationErrors,
+  UserController.login
 );
 
 app.listen(process.env.PORT, (err) => {
