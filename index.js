@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 import { signupValidation, loginValidation } from "./Validations/index.js";
 
-import { handleValidationErrors } from "./Utils/index.js";
+import { handleValidationErrors, checkAuth } from "./Utils/index.js";
 
 import { UserController } from "./Controllers/index.js";
 
@@ -36,6 +36,7 @@ app.post(
   handleValidationErrors,
   UserController.login
 );
+app.get("/auth/check", checkAuth, UserController.getCheckMe);
 
 app.listen(process.env.PORT, (err) => {
   if (err) {
