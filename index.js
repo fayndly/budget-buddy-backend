@@ -61,6 +61,7 @@ app.get(
   checkAuth,
   TransactionController.getAllByDate
 );
+app.get("/transactions/:id", checkAuth, TransactionController.getById);
 
 // checks
 app.get("/checks", checkAuth, CheckController.getAll);

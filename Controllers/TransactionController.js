@@ -126,3 +126,16 @@ export const getAllByDate = async (req, res) => {
     });
   }
 };
+
+export const getById = async (req, res) => {
+  try {
+    const docTransaction = await TransactionModel.findById(req.params.id);
+
+    res.json(docTransaction);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось найти транзакцию",
+    });
+  }
+};
