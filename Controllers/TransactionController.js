@@ -108,21 +108,30 @@ export const getAllByDate = async (req, res) => {
         path: "transactions.income",
         options: { strictPopulate: false },
       })
-      .exec();
+      .exec()
+      .then((doc) => {
+        return sortByDateInRange(
+          doc.transactions[req.params.type],
+          new Date(req.params.startDate),
+          new Date(req.params.endDate)
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(404).json({
+          message: "Не удалось найти транзакции",
+        });
+      });
 
     res.json({
       start: req.params.startDate,
       stop: req.params.endDate,
-      data: sortByDateInRange(
-        docTransactions.transactions[req.params.type],
-        new Date(req.params.startDate),
-        new Date(req.params.endDate)
-      ),
+      data: docTransactions,
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: "Не удалось найти транзакции",
+      message: "Не удалось получить транзакции",
     });
   }
 };
@@ -142,7 +151,7 @@ export const getById = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const doc = await TransactionModel.updateOne(
+    await TransactionModel.updateOne(
       {
         _id: req.params.id,
       },
@@ -156,16 +165,51 @@ export const update = async (req, res) => {
         date: req.body.date,
         fullDescription: req.body.fullDescription,
       }
-    );
+    ).catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        message: "Не удалось найти транзакцию",
+      });
+    });
 
     res.json({
       success: true,
-      data: doc,
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({
       message: "Не удалось обновить транзакцию",
+    });
+  }
+};
+
+export const remove = async (req, res) => {
+  try {
+    TransactionModel.findOneAndDelete({
+      _id: req.params.id,
+    })
+      .then((doc) => {
+        if (!doc) {
+          return res.status(404).json({
+            message: "Транзакция не найдена",
+          });
+        }
+        res.json({
+          success: true,
+        });
+      })
+      .catch((err) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            message: "Не удалось удалить транзакцию",
+          });
+        }
+      });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось получить транзакцию",
     });
   }
 };

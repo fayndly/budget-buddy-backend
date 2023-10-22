@@ -62,6 +62,7 @@ app.patch(
   handleValidationErrors,
   TransactionController.update
 );
+app.delete("/transactions/:id", checkAuth, TransactionController.remove);
 app.get("/transactions", checkAuth, TransactionController.getAll);
 app.get(
   "/transactions/:check/:type/:startDate/:endDate",
