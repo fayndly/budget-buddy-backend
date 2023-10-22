@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 import UserModel from "../Models/User.js";
+import CheckModel from "../Models/Check.js";
 
 export const signup = async (req, res) => {
   try {
@@ -9,13 +10,23 @@ export const signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const doc = new UserModel({
+    const docUser = new UserModel({
       email: req.body.email,
       userName: req.body.userName,
       passwordHash: hash,
+      checks: [],
     });
 
-    const user = await doc.save();
+    const user = await docUser.save();
+
+    const docCheck = new CheckModel({
+      name: "Общий",
+      user: user,
+    });
+
+    await docCheck.save();
+    docUser.checks.push(docCheck._id);
+    await docUser.save();
 
     const token = jwt.sign(
       {

@@ -3,26 +3,34 @@ import mongoose from "mongoose";
 const TransactionSchema = new mongoose.Schema(
   {
     type: {
-      type: String,
+      type: String, // expense - расход || income - доход
+      require: true,
     },
-    userId: {
-      type: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      require: true,
     },
     shortDescription: {
       type: String,
+      require: true,
     },
     amount: {
       type: Number,
+      require: true,
     },
     check: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Check",
+      require: true,
     },
     category: {
       type: String,
+      require: true,
     },
     date: {
       type: Date,
-      default: Date.now(),
+      require: true,
     },
     fullDescription: String,
   },

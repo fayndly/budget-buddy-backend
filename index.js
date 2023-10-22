@@ -14,7 +14,11 @@ import {
 
 import { handleValidationErrors, checkAuth } from "./Utils/index.js";
 
-import { UserController, TransactionController } from "./Controllers/index.js";
+import {
+  UserController,
+  TransactionController,
+  CheckController,
+} from "./Controllers/index.js";
 
 const mongoUrl = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER_NAME}.1r0hst3.mongodb.net/${process.env.MONGODB_DB_NAME}?retryWrites=true&w=majority`;
 
@@ -52,6 +56,14 @@ app.post(
   TransactionController.create
 );
 app.get("/transactions", checkAuth, TransactionController.getAll);
+app.get(
+  "/transactions/:check/:type/:startDate/:endDate",
+  checkAuth,
+  TransactionController.getAllByDate
+);
+
+// checks
+app.get("/checks", checkAuth, CheckController.getAll);
 
 app.listen(process.env.PORT, (err) => {
   if (err) {
