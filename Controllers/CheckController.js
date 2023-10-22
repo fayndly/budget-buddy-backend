@@ -2,10 +2,15 @@ import CheckModel from "../Models/Check.js";
 
 export const getAll = async (req, res) => {
   try {
-    const checks = await CheckModel.find({ user: req.userId }).populate(
-      "user",
-      "transaction"
-    );
+    const checks = await CheckModel.find({ user: req.userId })
+      .populate({
+        path: "transactions.expense",
+        options: { strictPopulate: false },
+      })
+      .populate({
+        path: "transactions.income",
+        options: { strictPopulate: false },
+      });
     return res.json(checks);
   } catch (err) {
     console.log(err);

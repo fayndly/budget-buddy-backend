@@ -21,6 +21,7 @@ export const transactionCreateValidation = [
   body("amount", "Введите сумму транзакции").isFloat(),
   body("check", "Выберите счет").isString(),
   body("date", "Выберите дату транзакции").isString(),
+  body("category", "Выберите категорию транзакции").isString(),
   body("fullDescription", "Не верный формат записи описания")
     .optional()
     .isString(),

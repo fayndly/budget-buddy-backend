@@ -55,6 +55,13 @@ app.post(
   handleValidationErrors,
   TransactionController.create
 );
+app.patch(
+  "/transactions/:id",
+  checkAuth,
+  transactionCreateValidation,
+  handleValidationErrors,
+  TransactionController.update
+);
 app.get("/transactions", checkAuth, TransactionController.getAll);
 app.get(
   "/transactions/:check/:type/:startDate/:endDate",

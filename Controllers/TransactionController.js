@@ -139,3 +139,33 @@ export const getById = async (req, res) => {
     });
   }
 };
+
+export const update = async (req, res) => {
+  try {
+    const doc = await TransactionModel.updateOne(
+      {
+        _id: req.params.id,
+      },
+      {
+        type: req.body.type,
+        user: req.userId,
+        shortDescription: req.body.shortDescription,
+        amount: req.body.amount,
+        check: req.body.check,
+        category: req.body.category,
+        date: req.body.date,
+        fullDescription: req.body.fullDescription,
+      }
+    );
+
+    res.json({
+      success: true,
+      data: doc,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось обновить транзакцию",
+    });
+  }
+};
