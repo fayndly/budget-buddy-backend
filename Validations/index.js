@@ -32,13 +32,9 @@ export const transactionCreateValidation = [
 ];
 
 export const checkCreateValidation = [
-  body(
-    "isIncludeGeneralCheck",
-    "Выберите включается ли этот счет в основной"
-  ).isBoolean(),
   body("name", "Неверное имя счета").isString(),
   body("amount", "Неверное первоначальная сумма счета").isFloat(),
-  body("currency", "Выберите основную валюту счета").isFloat(),
+  body("currency", "Выберите основную валюту счета").isString(),
   body("color", "Неправильный цвет").isHexColor(),
 ];
 

@@ -73,13 +73,13 @@ app.get("/auth/check", checkAuth, UserController.getCheckMe);
 // ); // get all by date transactions
 
 // checks
-// app.post(
-//   "/checks",
-//   checkAuth,
-//   checkCreateValidation,
-//   handleValidationErrors,
-//   CheckController.create
-// ); // create check
+app.post(
+  "/checks",
+  checkAuth,
+  checkCreateValidation,
+  handleValidationErrors,
+  CheckController.create
+); // create check
 // app.get("/checks", checkAuth, CheckController.getAll); // get all checks
 // app.patch(
 //   "/checks/:id",

@@ -1,7 +1,30 @@
 import CheckModel from "../Models/Check.js";
-import UserModel from "../Models/User.js";
 
-import mongoose from "mongoose";
+import serverErrorHandler from "../Utils/ServerErrorHandler.js";
+
+export const create = async (req, res) => {
+  try {
+    const checkDoc = new CheckModel({
+      user: req.userId,
+      name: req.body.name,
+      amount: req.body.amount,
+      currency: req.body.currency,
+      color: req.body.color,
+      transactions: {
+        expense: [],
+        income: [],
+      },
+    });
+
+    await checkDoc.save();
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось создать счет");
+  }
+};
 
 export const getAll = async (req, res) => {
   try {
@@ -20,51 +43,5 @@ export const getAll = async (req, res) => {
     res.status(500).json({
       message: "Не удалось найти транзакции",
     });
-  }
-};
-
-export const create = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    const checkDoc = new CheckModel({
-      name: req.body.name,
-      user: req.userId,
-      amount: req.body.amount,
-      transactions: {
-        expense: [],
-        income: [],
-      },
-    });
-    await checkDoc.save({ session });
-
-    await UserModel.findById(req.userId)
-      .session(session)
-      .then(async (doc) => {
-        doc.checks.push(checkDoc);
-        await doc.save({ session });
-
-        await session.commitTransaction();
-
-        return res.json({
-          success: true,
-          body: { ...checkDoc._doc },
-        });
-      })
-      .catch(async (err) => {
-        await session.abortTransaction();
-        console.log(err);
-        return res.status(500).json({
-          message: "Не удалось найти пользователя",
-        });
-      });
-  } catch (err) {
-    await session.abortTransaction();
-    console.log(err);
-    res.status(500).json({
-      message: "Не удалось создать счет",
-    });
-  } finally {
-    session.endSession();
   }
 };

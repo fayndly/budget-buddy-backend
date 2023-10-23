@@ -7,16 +7,6 @@ const CheckSchema = new mongoose.Schema(
       ref: "User",
       require: true,
     },
-    isGeneral: {
-      type: Boolean,
-      default: false,
-    },
-    includedChecks: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Check",
-      },
-    ],
     name: {
       type: String,
       require: true,
