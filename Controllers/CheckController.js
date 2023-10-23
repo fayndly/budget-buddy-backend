@@ -28,20 +28,13 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const checks = await CheckModel.find({ user: req.userId })
-      .populate({
-        path: "transactions.expense",
-        options: { strictPopulate: false },
-      })
-      .populate({
-        path: "transactions.income",
-        options: { strictPopulate: false },
-      });
-    return res.json(checks);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Не удалось найти транзакции",
+    const checks = await CheckModel.find({ user: req.userId }).populate({
+      path: "currency",
+      options: { strictPopulate: false },
     });
+
+    res.json(checks);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти счет");
   }
 };

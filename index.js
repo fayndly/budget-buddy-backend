@@ -80,7 +80,7 @@ app.post(
   handleValidationErrors,
   CheckController.create
 ); // create check
-// app.get("/checks", checkAuth, CheckController.getAll); // get all checks
+app.get("/checks", checkAuth, CheckController.getAll); // get all checks
 // app.patch(
 //   "/checks/:id",
 //   checkAuth,
