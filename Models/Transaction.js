@@ -2,17 +2,22 @@ import mongoose from "mongoose";
 
 const TransactionSchema = new mongoose.Schema(
   {
-    type: {
-      type: String, // expense - расход || income - доход
-      require: true,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       require: true,
     },
+    type: {
+      type: "expense" || "income",
+      require: true,
+    },
     shortDescription: {
       type: String,
+      require: true,
+    },
+    currency: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Currency",
       require: true,
     },
     amount: {
@@ -25,10 +30,11 @@ const TransactionSchema = new mongoose.Schema(
       require: true,
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       require: true,
     },
-    date: {
+    time: {
       type: Date,
       require: true,
     },
