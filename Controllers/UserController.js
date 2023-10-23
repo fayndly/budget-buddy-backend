@@ -1,38 +1,22 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+import serverErrorHandler from "../Utils/ServerErrorHandler.js";
+
 import UserModel from "../Models/User.js";
-import CheckModel from "../Models/Check.js";
 
 export const signup = async (req, res) => {
   try {
-    const password = req.body.password;
     const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+    const hash = await bcrypt.hash(req.body.password, salt);
 
     const docUser = new UserModel({
       email: req.body.email,
       userName: req.body.userName,
       passwordHash: hash,
-      checks: [],
     });
 
     const user = await docUser.save();
-
-    const docCheck = new CheckModel({
-      name: "общий",
-      user: user,
-      amount: 0,
-      color: "#2A5A1E",
-      transactions: {
-        expense: [],
-        income: [],
-      },
-    });
-
-    await docCheck.save();
-    docUser.checks.push(docCheck._id);
-    await docUser.save();
 
     const token = jwt.sign(
       {
@@ -44,17 +28,12 @@ export const signup = async (req, res) => {
       }
     );
 
-    const { passwordHash, ...userData } = user._doc;
-
     res.json({
-      ...userData,
+      success: true,
       token,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Не удалось зарегистрироваться",
-    });
+    serverErrorHandler(res, err, "Не удалось зарегистрироваться");
   }
 };
 
@@ -89,17 +68,12 @@ export const login = async (req, res) => {
       }
     );
 
-    const { passwordHash, ...userData } = user._doc;
-
     res.json({
-      ...userData,
+      success: true,
       token,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Не удалось авторизоваться",
-    });
+    serverErrorHandler(res, err, "Не удалось авторизоваться");
   }
 };
 
@@ -117,9 +91,6 @@ export const getCheckMe = async (req, res) => {
 
     res.json(userData);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Нет доступа",
-    });
+    serverErrorHandler(res, err, "Нет доступа");
   }
 };

@@ -12,7 +12,7 @@ const CategorySchema = new mongoose.Schema(
       require: true,
     },
     type: {
-      type: "expense" || "income",
+      type: String, // "expense" || "income",
       require: true,
     },
     color: {

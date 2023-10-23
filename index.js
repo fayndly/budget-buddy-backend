@@ -1,10 +1,9 @@
 import express from "express";
 import cors from "cors";
-
-import dotenv from "dotenv";
-dotenv.config();
-
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 import {
   signupValidation,
@@ -49,38 +48,49 @@ app.post(
 app.get("/auth/check", checkAuth, UserController.getCheckMe);
 
 // transactions
-app.post(
-  "/transactions",
-  checkAuth,
-  transactionCreateValidation,
-  handleValidationErrors,
-  TransactionController.create
-); // create transaction
-app.patch(
-  "/transactions/:id",
-  checkAuth,
-  transactionCreateValidation,
-  handleValidationErrors,
-  TransactionController.update
-); // update transaction
-app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
-app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
-app.get("/transactions/:id", checkAuth, TransactionController.getById); // get by id transactions
-app.get(
-  "/transactions/:check/:type/:startDate/:endDate",
-  checkAuth,
-  TransactionController.getAllByDate
-); // get all by date transactions
+// app.post(
+//   "/transactions",
+//   checkAuth,
+//   transactionCreateValidation,
+//   handleValidationErrors,
+//   TransactionController.create
+// ); // create transaction
+// app.patch(
+//   "/transactions/:id",
+//   checkAuth,
+//   transactionCreateValidation,
+//   handleValidationErrors,
+//   TransactionController.update
+// ); // update transaction
+// app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
+// app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
+// app.get("/transactions/:id", checkAuth, TransactionController.getById); // get by id transactions
+// app.get(
+//   "/transactions/:check/:type/:startDate/:endDate",
+//   checkAuth,
+//   TransactionController.getAllByDate
+// ); // get all by date transactions
 
 // checks
-app.post(
-  "/checks",
-  checkAuth,
-  checkCreateValidation,
-  handleValidationErrors,
-  CheckController.create
-); // create check
-app.get("/checks", checkAuth, CheckController.getAll); // get all checks
+// app.post(
+//   "/checks",
+//   checkAuth,
+//   checkCreateValidation,
+//   handleValidationErrors,
+//   CheckController.create
+// ); // create check
+// app.get("/checks", checkAuth, CheckController.getAll); // get all checks
+// app.patch(
+//   "/checks/:id",
+//   checkAuth,
+//   checkCreateValidation,
+//   handleValidationErrors,
+//   CheckController.update
+// ); // update check
+// app.delete("/checks/:id", checkAuth, CheckController.remove); // remove check
+
+// currencies
+// app.get("/currencies", checkAuth, CurrencyController.getAll); // get all currencies
 
 app.listen(process.env.PORT, (err) => {
   if (err) {
