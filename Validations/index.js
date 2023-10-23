@@ -26,3 +26,9 @@ export const transactionCreateValidation = [
     .optional()
     .isString(),
 ];
+
+export const checkCreateValidation = [
+  body("name", "Неверное имя счета").isString(),
+  body("amount", "Неверное первоначальная сумма счета").isFloat(),
+  body("color", "Неправильный цвет").isHexColor(),
+];

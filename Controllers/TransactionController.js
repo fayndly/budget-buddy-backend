@@ -32,16 +32,26 @@ export const create = async (req, res) => {
     });
     await transaction.save({ session });
 
-    const check = await CheckModel.findById(req.body.check).session(session);
-    check.transactions[req.body.type].push(transaction);
-    await check.save({ session });
+    const check = await CheckModel.findById(req.body.check)
+      .session(session)
+      .then(async (doc) => {
+        doc.transactions[req.body.type].push(transaction);
+        await doc.save({ session });
 
-    await session.commitTransaction();
+        await session.commitTransaction();
 
-    res.json({
-      success: true,
-      body: { ...transaction._doc },
-    });
+        return res.json({
+          success: true,
+          body: { ...transaction._doc },
+        });
+      })
+      .catch(async (err) => {
+        await session.abortTransaction();
+        console.log(err);
+        return res.status(404).json({
+          message: "Не удалось найти счет",
+        });
+      });
   } catch (err) {
     await session.abortTransaction();
     console.log(err);

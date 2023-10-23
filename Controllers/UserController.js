@@ -20,8 +20,14 @@ export const signup = async (req, res) => {
     const user = await docUser.save();
 
     const docCheck = new CheckModel({
-      name: "Общий",
+      name: "общий",
       user: user,
+      amount: 0,
+      color: "#2A5A1E",
+      transactions: {
+        expense: [],
+        income: [],
+      },
     });
 
     await docCheck.save();

@@ -10,6 +10,7 @@ import {
   signupValidation,
   loginValidation,
   transactionCreateValidation,
+  checkCreateValidation,
 } from "./Validations/index.js";
 
 import { handleValidationErrors, checkAuth } from "./Utils/index.js";
@@ -54,25 +55,32 @@ app.post(
   transactionCreateValidation,
   handleValidationErrors,
   TransactionController.create
-);
+); // create transaction
 app.patch(
   "/transactions/:id",
   checkAuth,
   transactionCreateValidation,
   handleValidationErrors,
   TransactionController.update
-);
-app.delete("/transactions/:id", checkAuth, TransactionController.remove);
-app.get("/transactions", checkAuth, TransactionController.getAll);
+); // update transaction
+app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
+app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
+app.get("/transactions/:id", checkAuth, TransactionController.getById); // get by id transactions
 app.get(
   "/transactions/:check/:type/:startDate/:endDate",
   checkAuth,
   TransactionController.getAllByDate
-);
-app.get("/transactions/:id", checkAuth, TransactionController.getById);
+); // get all by date transactions
 
 // checks
-app.get("/checks", checkAuth, CheckController.getAll);
+app.post(
+  "/checks",
+  checkAuth,
+  checkCreateValidation,
+  handleValidationErrors,
+  CheckController.create
+); // create check
+app.get("/checks", checkAuth, CheckController.getAll); // get all checks
 
 app.listen(process.env.PORT, (err) => {
   if (err) {
