@@ -101,7 +101,7 @@ app.post(
   CategoryController.create
 ); // create category'
 app.get("/categories", checkAuth, CategoryController.getAll); // get all categories
-app.get("/categories/:type", checkAuth, CategoryController.getAllByType); // get all categories
+app.get("/categories/:id", checkAuth, CategoryController.getOneById); // get all categories
 
 // currencies
 app.get("/currencies", checkAuth, CurrencyController.getAll); // get all currencies

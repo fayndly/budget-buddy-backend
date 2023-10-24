@@ -24,7 +24,17 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const categories = await CategoryModel.find({ user: req.userId });
+    let categories = await CategoryModel.find({ user: req.userId });
+
+    if (!categories.length) {
+      return res.status(404).json({
+        message: "Не удалось найти категорий",
+      });
+    }
+
+    if (req.query.type) {
+      categories = categories.filter((el) => el.type === req.query.type);
+    }
 
     res.json(categories);
   } catch (err) {
@@ -32,15 +42,12 @@ export const getAll = async (req, res) => {
   }
 };
 
-export const getAllByType = async (req, res) => {
+export const getOneById = async (req, res) => {
   try {
-    const categories = await CategoryModel.find({
-      user: req.userId,
-      type: req.params.type,
-    });
+    const category = await CategoryModel.findById(req.params.id);
 
-    res.json(categories);
+    res.json(category);
   } catch (err) {
-    serverErrorHandler(res, err, "Не удалось найти категории");
+    serverErrorHandler(res, err, "Не удалось найти категорию");
   }
 };
