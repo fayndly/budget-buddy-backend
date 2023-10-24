@@ -49,13 +49,13 @@ app.post(
 app.get("/auth/check", checkAuth, UserController.getCheckMe);
 
 // transactions
-// app.post(
-//   "/transactions",
-//   checkAuth,
-//   transactionCreateValidation,
-//   handleValidationErrors,
-//   TransactionController.create
-// ); // create transaction
+app.post(
+  "/transactions",
+  checkAuth,
+  transactionCreateValidation,
+  handleValidationErrors,
+  TransactionController.create
+); // create transaction
 // app.patch(
 //   "/transactions/:id",
 //   checkAuth,
