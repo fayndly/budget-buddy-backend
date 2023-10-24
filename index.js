@@ -100,11 +100,7 @@ app.post(
   handleValidationErrors,
   CategoryController.create
 ); // create category'
-// app.get(
-//   "/categories",
-//   checkAuth,
-//   CategoryController.getAll
-// ); // get all categories
+app.get("/categories", checkAuth, CategoryController.getAll); // get all categories
 
 // currencies
 app.get("/currencies", checkAuth, CurrencyController.getAll); // get all currencies

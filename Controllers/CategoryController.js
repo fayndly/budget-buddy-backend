@@ -5,7 +5,7 @@ import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 export const create = async (req, res) => {
   try {
     const categoryDoc = new CategoryModel({
-      user: req.userID,
+      user: req.userId,
       name: req.body.name,
       type: req.body.type,
       color: req.body.color,
@@ -19,5 +19,15 @@ export const create = async (req, res) => {
     });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось создать категорию");
+  }
+};
+
+export const getAll = async (req, res) => {
+  try {
+    const categories = await CategoryModel.find({ user: req.userId });
+
+    res.json(categories);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти категории");
   }
 };
