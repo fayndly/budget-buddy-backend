@@ -10,6 +10,7 @@ import {
   loginValidation,
   transactionCreateValidation,
   checkCreateValidation,
+  categoryCreateValidation,
 } from "./Validations/index.js";
 
 import { handleValidationErrors, checkAuth } from "./Utils/index.js";
@@ -19,6 +20,7 @@ import {
   TransactionController,
   CheckController,
   CurrencyController,
+  CategoryController,
 } from "./Controllers/index.js";
 
 const mongoUrl = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER_NAME}.1r0hst3.mongodb.net/${process.env.MONGODB_DB_NAME}?retryWrites=true&w=majority`;
@@ -89,6 +91,20 @@ app.patch(
   CheckController.update
 ); // update check
 app.delete("/checks/:id", checkAuth, CheckController.remove); // remove check
+
+// categories
+app.post(
+  "/categories",
+  checkAuth,
+  categoryCreateValidation,
+  handleValidationErrors,
+  CategoryController.create
+); // create category'
+// app.get(
+//   "/categories",
+//   checkAuth,
+//   CategoryController.getAll
+// ); // get all categories
 
 // currencies
 app.get("/currencies", checkAuth, CurrencyController.getAll); // get all currencies

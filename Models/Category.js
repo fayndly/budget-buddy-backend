@@ -20,7 +20,7 @@ const CategorySchema = new mongoose.Schema(
       require: true,
     },
     icon: {
-      type: String || null,
+      type: String,
       default: null,
     },
   },
