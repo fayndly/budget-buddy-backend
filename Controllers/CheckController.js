@@ -35,6 +35,34 @@ export const getAll = async (req, res) => {
 
     res.json(checks);
   } catch (err) {
-    serverErrorHandler(res, err, "Не удалось найти счет");
+    serverErrorHandler(res, err, "Не удалось найти счета");
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    await CheckModel.updateOne(
+      {
+        _id: req.params.id,
+      },
+      {
+        name: req.body.name,
+        amount: req.body.amount,
+        currency: req.body.currency,
+        color: req.body.color,
+      }
+    ).catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        success: false,
+        message: "Не удалось найти транзакцию",
+      });
+    });
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось обновить транзакцию");
   }
 };

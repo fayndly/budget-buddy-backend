@@ -81,13 +81,13 @@ app.post(
   CheckController.create
 ); // create check
 app.get("/checks", checkAuth, CheckController.getAll); // get all checks
-// app.patch(
-//   "/checks/:id",
-//   checkAuth,
-//   checkCreateValidation,
-//   handleValidationErrors,
-//   CheckController.update
-// ); // update check
+app.patch(
+  "/checks/:id",
+  checkAuth,
+  checkCreateValidation,
+  handleValidationErrors,
+  CheckController.update
+); // update check
 // app.delete("/checks/:id", checkAuth, CheckController.remove); // remove check
 
 // currencies
