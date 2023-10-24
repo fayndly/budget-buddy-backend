@@ -31,3 +31,16 @@ export const getAll = async (req, res) => {
     serverErrorHandler(res, err, "Не удалось найти категории");
   }
 };
+
+export const getAllByType = async (req, res) => {
+  try {
+    const categories = await CategoryModel.find({
+      user: req.userId,
+      type: req.params.type,
+    });
+
+    res.json(categories);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти категории");
+  }
+};
