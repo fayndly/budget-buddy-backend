@@ -88,7 +88,7 @@ app.patch(
   handleValidationErrors,
   CheckController.update
 ); // update check
-// app.delete("/checks/:id", checkAuth, CheckController.remove); // remove check
+app.delete("/checks/:id", checkAuth, CheckController.remove); // remove check
 
 // currencies
 app.get("/currencies", checkAuth, CurrencyController.getAll); // get all currencies

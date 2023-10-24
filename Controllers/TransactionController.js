@@ -195,7 +195,7 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    TransactionModel.findOneAndDelete({
+    CheckModel.findOneAndDelete({
       _id: req.params.id,
     })
       .then((doc) => {

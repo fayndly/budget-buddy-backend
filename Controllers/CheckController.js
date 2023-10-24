@@ -55,7 +55,7 @@ export const update = async (req, res) => {
       console.log(err);
       res.status(404).json({
         success: false,
-        message: "Не удалось найти транзакцию",
+        message: "Не удалось найти счет",
       });
     });
 
@@ -63,6 +63,30 @@ export const update = async (req, res) => {
       success: true,
     });
   } catch (err) {
-    serverErrorHandler(res, err, "Не удалось обновить транзакцию");
+    serverErrorHandler(res, err, "Не удалось обновить счет");
+  }
+};
+
+export const remove = async (req, res) => {
+  try {
+    await CheckModel.findOneAndDelete({
+      _id: req.params.id,
+    })
+      .then((doc) => {
+        if (!doc) {
+          return res.status(404).json({
+            success: false,
+            message: "Счет не найден",
+          });
+        }
+        res.json({
+          success: true,
+        });
+      })
+      .catch((err) => {
+        return serverErrorHandler(res, err, "Не удалось удалить счет");
+      });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось удалить счет");
   }
 };
