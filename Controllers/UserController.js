@@ -6,58 +6,39 @@ import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 import UserModel from "../Models/User.js";
 import CategoryModel from "../Models/Category.js";
 
-const defaultCategories = {
-  expense: [
+const createDefaultCategories = async (user) => {
+  const defaultCategories = [
     {
+      user,
       name: "Продукты",
       type: "expense",
       color: "#1a1a1a",
       icon: "icon-category-expense",
     },
     {
+      user,
       name: "Транспорт",
       type: "expense",
       color: "#1a1a1a",
       icon: "icon-category-expense",
     },
-  ],
-  income: [
     {
+      user,
       name: "Зарплата",
       type: "income",
       color: "#1a1a1a",
       icon: "icon-category-income",
     },
     {
+      user,
       name: "Инвестиции",
       type: "income",
       color: "#1a1a1a",
       icon: "icon-category-income",
     },
-  ],
-};
-
-const createDefaultCategories = (user) => {
-  defaultCategories.expense.forEach(async (val) => {
-    const docCategory = new CategoryModel({
-      user,
-      name: val.name,
-      type: val.type,
-      color: val.color,
-      icon: val.icon,
-    });
-    await docCategory.save();
-  });
-
-  defaultCategories.income.forEach(async (val) => {
-    const docCategory = new CategoryModel({
-      user,
-      name: val.name,
-      type: val.type,
-      color: val.color,
-      icon: val.icon,
-    });
-    await docCategory.save();
+  ];
+  await CategoryModel.insertMany(defaultCategories).catch(() => {
+    throw new Error("Не удалось создать категории по умолчанию");
   });
 };
 
