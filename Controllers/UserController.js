@@ -4,6 +4,62 @@ import bcrypt from "bcrypt";
 import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 
 import UserModel from "../Models/User.js";
+import CategoryModel from "../Models/Category.js";
+
+const defaultCategories = {
+  expense: [
+    {
+      name: "Продукты",
+      type: "expense",
+      color: "#1a1a1a",
+      icon: "icon-category-expense",
+    },
+    {
+      name: "Транспорт",
+      type: "expense",
+      color: "#1a1a1a",
+      icon: "icon-category-expense",
+    },
+  ],
+  income: [
+    {
+      name: "Зарплата",
+      type: "income",
+      color: "#1a1a1a",
+      icon: "icon-category-income",
+    },
+    {
+      name: "Инвестиции",
+      type: "income",
+      color: "#1a1a1a",
+      icon: "icon-category-income",
+    },
+  ],
+};
+
+const createDefaultCategories = (user) => {
+  defaultCategories.expense.forEach(async (val) => {
+    const docCategory = new CategoryModel({
+      user,
+      name: val.name,
+      type: val.type,
+      color: val.color,
+      icon: val.icon,
+    });
+    await docCategory.save();
+  });
+
+  defaultCategories.income.forEach(async (val) => {
+    const docCategory = new CategoryModel({
+      user,
+      name: val.name,
+      type: val.type,
+      color: val.color,
+      icon: val.icon,
+    });
+    await docCategory.save();
+  });
+};
 
 export const signup = async (req, res) => {
   try {
@@ -17,6 +73,8 @@ export const signup = async (req, res) => {
     });
 
     const user = await docUser.save();
+
+    createDefaultCategories(user);
 
     const token = jwt.sign(
       {
