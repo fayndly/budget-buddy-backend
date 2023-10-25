@@ -53,11 +53,6 @@ app.get("/auth/check", checkAuth, UserController.getCheckMe);
 // transactions
 app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
 app.get("/transactions/:id", checkAuth, TransactionController.getOneById); // get by id transactions
-// app.get(
-//   "/transactions/:check/:type/:startDate/:endDate",
-//   checkAuth,
-//   TransactionController.getAllByDate
-// ); // get all by date transactions
 app.post(
   "/transactions",
   checkAuth,
@@ -72,7 +67,7 @@ app.patch(
   handleValidationErrors,
   TransactionController.update
 ); // update transaction
-// app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
+app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
 
 // checks
 app.get("/checks", checkAuth, CheckController.getAll); // get all checks

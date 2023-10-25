@@ -82,9 +82,7 @@ export const getAll = async (req, res) => {
       .exec();
 
     if (!transactions.length) {
-      return res.status(404).json({
-        message: "Не удалось найти транзакции у пользователя",
-      });
+      return res.json(transactions);
     }
 
     if (req.query.check) {
@@ -167,5 +165,29 @@ export const update = async (req, res) => {
     });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось обновить транзакцию");
+  }
+};
+
+export const remove = async (req, res) => {
+  try {
+    await TransactionModel.findOneAndDelete({
+      _id: req.params.id,
+    })
+      .then((doc) => {
+        if (!doc) {
+          return res.status(404).json({
+            success: false,
+            message: "Транзакция не найдена",
+          });
+        }
+        res.json({
+          success: true,
+        });
+      })
+      .catch((err) => {
+        return serverErrorHandler(res, err, "Не удалось удалить транзакцию");
+      });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось удалить транзакцию");
   }
 };
