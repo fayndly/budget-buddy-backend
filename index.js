@@ -51,6 +51,13 @@ app.post(
 app.get("/auth/check", checkAuth, UserController.getCheckMe);
 
 // transactions
+app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
+// app.get("/transactions/:id", checkAuth, TransactionController.getById); // get by id transactions
+// app.get(
+//   "/transactions/:check/:type/:startDate/:endDate",
+//   checkAuth,
+//   TransactionController.getAllByDate
+// ); // get all by date transactions
 app.post(
   "/transactions",
   checkAuth,
@@ -66,15 +73,9 @@ app.post(
 //   TransactionController.update
 // ); // update transaction
 // app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
-// app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
-// app.get("/transactions/:id", checkAuth, TransactionController.getById); // get by id transactions
-// app.get(
-//   "/transactions/:check/:type/:startDate/:endDate",
-//   checkAuth,
-//   TransactionController.getAllByDate
-// ); // get all by date transactions
 
 // checks
+app.get("/checks", checkAuth, CheckController.getAll); // get all checks
 app.post(
   "/checks",
   checkAuth,
@@ -82,7 +83,6 @@ app.post(
   handleValidationErrors,
   CheckController.create
 ); // create check
-app.get("/checks", checkAuth, CheckController.getAll); // get all checks
 app.patch(
   "/checks/:id",
   checkAuth,
@@ -93,6 +93,8 @@ app.patch(
 app.delete("/checks/:id", checkAuth, CheckController.remove); // remove check
 
 // categories
+app.get("/categories", checkAuth, CategoryController.getAll); // get all categories
+app.get("/categories/:id", checkAuth, CategoryController.getOneById); // get all categories
 app.post(
   "/categories",
   checkAuth,
@@ -100,8 +102,6 @@ app.post(
   handleValidationErrors,
   CategoryController.create
 ); // create category'
-app.get("/categories", checkAuth, CategoryController.getAll); // get all categories
-app.get("/categories/:id", checkAuth, CategoryController.getOneById); // get all categories
 
 // currencies
 app.get("/currencies", checkAuth, CurrencyController.getAll); // get all currencies

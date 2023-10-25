@@ -7,12 +7,12 @@ import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 
 function sortByDateInRange(array, startDate, endDate) {
   const filteredArray = array.filter(function (item) {
-    const date = new Date(item.date);
+    const date = new Date(item.time);
     return date >= startDate && date <= endDate;
   });
   filteredArray.sort(function (a, b) {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
+    const dateA = new Date(a.time);
+    const dateB = new Date(b.time);
     return dateB - dateA;
   });
   return filteredArray;
@@ -60,140 +60,48 @@ export const create = async (req, res) => {
   }
 };
 
-// export const getAll = async (req, res) => {
-//   try {
-//     const transactions = await TransactionModel.find({ user: req.userId })
-//       .populate("check")
-//       .exec();
-//     return res.json(transactions);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Не удалось найти транзакции",
-//     });
-//   }
-// };
+export const getAll = async (req, res) => {
+  try {
+    let transactions = await TransactionModel.find({ user: req.userId })
+      .populate({
+        path: "check",
+        options: { strictPopulate: false },
+        select:
+          "-transactions -user -amount -currency -color -createdAt -updatedAt -__v",
+      })
+      .populate({
+        path: "category",
+        options: { strictPopulate: false },
+        select: "-createdAt -updatedAt -__v -user",
+      })
+      .exec();
 
-// export const getAllByDate = async (req, res) => {
-//   try {
-//     // const transactions = await CheckModel.find({
-//     //   check: req.params.check,
-//     //   type: req.params.type,
-//     //   userId: req.userId,
-//     //   date: { $gte: req.params.startDate, $lte: req.params.endDate },
-//     // });
+    if (!transactions.length) {
+      return res.status(404).json({
+        message: "Не удалось найти транзакции у пользователя",
+      });
+    }
 
-//     const docTransactions = await CheckModel.findOne({ _id: req.params.check })
-//       .populate({
-//         path: "transactions.expense",
-//         options: { strictPopulate: false },
-//       })
-//       .populate({
-//         path: "transactions.income",
-//         options: { strictPopulate: false },
-//       })
-//       .exec()
-//       .then((doc) => {
-//         return sortByDateInRange(
-//           doc.transactions[req.params.type],
-//           new Date(req.params.startDate),
-//           new Date(req.params.endDate)
-//         );
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//         res.status(404).json({
-//           message: "Не удалось найти транзакции",
-//         });
-//       });
+    if (req.query.check) {
+      transactions = transactions.filter(
+        (val) => val.check._id.toString() === req.query.check
+      );
+    }
 
-//     res.json({
-//       start: req.params.startDate,
-//       stop: req.params.endDate,
-//       data: docTransactions,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Не удалось получить транзакции",
-//     });
-//   }
-// };
+    if (req.query.type) {
+      transactions = transactions.filter((val) => val.type === req.query.type);
+    }
 
-// export const getById = async (req, res) => {
-//   try {
-//     const docTransaction = await TransactionModel.findById(req.params.id);
+    if (req.query.startTime && req.query.endTime) {
+      transactions = sortByDateInRange(
+        transactions,
+        new Date(req.query.startTime),
+        new Date(req.query.endTime)
+      );
+    }
 
-//     res.json(docTransaction);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Не удалось найти транзакцию",
-//     });
-//   }
-// };
-
-// export const update = async (req, res) => {
-//   try {
-//     await TransactionModel.updateOne(
-//       {
-//         _id: req.params.id,
-//       },
-//       {
-//         type: req.body.type,
-//         user: req.userId,
-//         shortDescription: req.body.shortDescription,
-//         amount: req.body.amount,
-//         check: req.body.check,
-//         category: req.body.category,
-//         date: req.body.date,
-//         fullDescription: req.body.fullDescription,
-//       }
-//     ).catch((err) => {
-//       console.log(err);
-//       res.status(404).json({
-//         message: "Не удалось найти транзакцию",
-//       });
-//     });
-
-//     res.json({
-//       success: true,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Не удалось обновить транзакцию",
-//     });
-//   }
-// };
-
-// export const remove = async (req, res) => {
-//   try {
-//     CheckModel.findOneAndDelete({
-//       _id: req.params.id,
-//     })
-//       .then((doc) => {
-//         if (!doc) {
-//           return res.status(404).json({
-//             message: "Транзакция не найдена",
-//           });
-//         }
-//         res.json({
-//           success: true,
-//         });
-//       })
-//       .catch((err) => {
-//         if (err) {
-//           console.log(err);
-//           return res.status(500).json({
-//             message: "Не удалось удалить транзакцию",
-//           });
-//         }
-//       });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Не удалось получить транзакцию",
-//     });
-//   }
-// };
+    return res.json(transactions);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти транзакции");
+  }
+};
