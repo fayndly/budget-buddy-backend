@@ -65,13 +65,13 @@ app.post(
   handleValidationErrors,
   TransactionController.create
 ); // create transaction
-// app.patch(
-//   "/transactions/:id",
-//   checkAuth,
-//   transactionCreateValidation,
-//   handleValidationErrors,
-//   TransactionController.update
-// ); // update transaction
+app.patch(
+  "/transactions/:id",
+  checkAuth,
+  transactionCreateValidation,
+  handleValidationErrors,
+  TransactionController.update
+); // update transaction
 // app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
 
 // checks

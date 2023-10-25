@@ -137,3 +137,35 @@ export const getOneById = async (req, res) => {
     serverErrorHandler(res, err, "Не удалось найти транзакцию");
   }
 };
+
+export const update = async (req, res) => {
+  try {
+    await TransactionModel.updateOne(
+      {
+        _id: req.params.id,
+      },
+      {
+        type: req.body.type,
+        shortDescription: req.body.shortDescription,
+        currency: req.body.currency,
+        amount: req.body.amount,
+        check: req.body.check,
+        category: req.body.category,
+        time: req.body.time,
+        fullDescription: req.body.fullDescription,
+      }
+    ).catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        success: false,
+        message: "Не удалось найти транзакцию",
+      });
+    });
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось обновить транзакцию");
+  }
+};
