@@ -39,6 +39,16 @@ export const getAll = async (req, res) => {
   }
 };
 
+export const getOneById = async (req, res) => {
+  try {
+    const check = await CheckModel.findById(req.params.id);
+
+    res.json(check);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти счет");
+  }
+};
+
 export const update = async (req, res) => {
   try {
     await CheckModel.updateOne(

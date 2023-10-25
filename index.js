@@ -76,6 +76,7 @@ app.post(
 
 // checks
 app.get("/checks", checkAuth, CheckController.getAll); // get all checks
+app.get("/checks/:id", checkAuth, CheckController.getOneById); // get all checks
 app.post(
   "/checks",
   checkAuth,
