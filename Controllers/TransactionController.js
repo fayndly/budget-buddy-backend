@@ -74,6 +74,11 @@ export const getAll = async (req, res) => {
         options: { strictPopulate: false },
         select: "-createdAt -updatedAt -__v -user",
       })
+      .populate({
+        path: "currency",
+        options: { strictPopulate: false },
+        select: "-createdAt -updatedAt -__v",
+      })
       .exec();
 
     if (!transactions.length) {
@@ -103,5 +108,32 @@ export const getAll = async (req, res) => {
     return res.json(transactions);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось найти транзакции");
+  }
+};
+
+export const getOneById = async (req, res) => {
+  try {
+    const transaction = await TransactionModel.findById(req.params.id)
+      .populate({
+        path: "check",
+        options: { strictPopulate: false },
+        select:
+          "-transactions -user -amount -currency -color -createdAt -updatedAt -__v",
+      })
+      .populate({
+        path: "category",
+        options: { strictPopulate: false },
+        select: "-createdAt -updatedAt -__v -user",
+      })
+      .populate({
+        path: "currency",
+        options: { strictPopulate: false },
+        select: "-createdAt -updatedAt -__v",
+      })
+      .exec();
+
+    res.json(transaction);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти транзакцию");
   }
 };
