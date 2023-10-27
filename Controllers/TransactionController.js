@@ -5,18 +5,7 @@ import CheckModel from "../Models/Check.js";
 
 import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 
-function sortByDateInRange(array, startDate, endDate) {
-  const filteredArray = array.filter(function (item) {
-    const date = new Date(item.time);
-    return date >= startDate && date <= endDate;
-  });
-  filteredArray.sort(function (a, b) {
-    const dateA = new Date(a.time);
-    const dateB = new Date(b.time);
-    return dateB - dateA;
-  });
-  return filteredArray;
-}
+import sortByDateInRange from "../Helpers/SortByDateInRange.js";
 
 export const create = async (req, res) => {
   const session = await mongoose.startSession();
@@ -24,14 +13,7 @@ export const create = async (req, res) => {
   try {
     const transaction = new TransactionModel({
       user: req.userId,
-      type: req.body.type,
-      shortDescription: req.body.shortDescription,
-      currency: req.body.currency,
-      amount: req.body.amount,
-      check: req.body.check,
-      category: req.body.category,
-      time: req.body.time,
-      fullDescription: req.body.fullDescription,
+      ...req.body,
     });
     await transaction.save({ session });
 
@@ -46,6 +28,13 @@ export const create = async (req, res) => {
     }
 
     check.transactions[req.body.type].push(transaction);
+
+    if (transaction.type === "expense") {
+      check.amount += transaction.amount;
+    } else if (req.body.type === "income") {
+      check.amount -= transaction.amount;
+    }
+
     await check.save({ session });
 
     await session.commitTransaction();
@@ -138,31 +127,26 @@ export const getOneById = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    await TransactionModel.updateOne(
+    await TransactionModel.findOneAndUpdate(
       {
         _id: req.params.id,
       },
-      {
-        type: req.body.type,
-        shortDescription: req.body.shortDescription,
-        currency: req.body.currency,
-        amount: req.body.amount,
-        check: req.body.check,
-        category: req.body.category,
-        time: req.body.time,
-        fullDescription: req.body.fullDescription,
-      }
-    ).catch((err) => {
-      console.log(err);
-      res.status(404).json({
-        success: false,
-        message: "Не удалось найти транзакцию",
+      { $set: req.body },
+      { new: true }
+    )
+      .then((val) => {
+        return res.json({
+          success: true,
+          data: val,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(404).json({
+          success: false,
+          message: "Не удалось найти транзакцию",
+        });
       });
-    });
-
-    res.json({
-      success: true,
-    });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось обновить транзакцию");
   }
