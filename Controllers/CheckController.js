@@ -1,70 +1,102 @@
 import CheckModel from "../Models/Check.js";
-import UserModel from "../Models/User.js";
 
-import mongoose from "mongoose";
-
-export const getAll = async (req, res) => {
-  try {
-    const checks = await CheckModel.find({ user: req.userId })
-      .populate({
-        path: "transactions.expense",
-        options: { strictPopulate: false },
-      })
-      .populate({
-        path: "transactions.income",
-        options: { strictPopulate: false },
-      });
-    return res.json(checks);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Не удалось найти транзакции",
-    });
-  }
-};
+import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 
 export const create = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
     const checkDoc = new CheckModel({
-      name: req.body.name,
       user: req.userId,
+      name: req.body.name,
       amount: req.body.amount,
+      currency: req.body.currency,
+      color: req.body.color,
       transactions: {
         expense: [],
         income: [],
       },
     });
-    await checkDoc.save({ session });
 
-    await UserModel.findById(req.userId)
-      .session(session)
-      .then(async (doc) => {
-        doc.checks.push(checkDoc);
-        await doc.save({ session });
+    await checkDoc.save();
 
-        await session.commitTransaction();
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось создать счет");
+  }
+};
 
-        return res.json({
+export const getAll = async (req, res) => {
+  try {
+    const checks = await CheckModel.find({ user: req.userId }).populate({
+      path: "currency",
+      options: { strictPopulate: false },
+    });
+
+    res.json(checks);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти счета");
+  }
+};
+
+export const getOneById = async (req, res) => {
+  try {
+    const check = await CheckModel.findById(req.params.id);
+
+    res.json(check);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти счет");
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    await CheckModel.updateOne(
+      {
+        _id: req.params.id,
+      },
+      {
+        name: req.body.name,
+        amount: req.body.amount,
+        currency: req.body.currency,
+        color: req.body.color,
+      }
+    ).catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        success: false,
+        message: "Не удалось найти счет",
+      });
+    });
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось обновить счет");
+  }
+};
+
+export const remove = async (req, res) => {
+  try {
+    await CheckModel.findOneAndDelete({
+      _id: req.params.id,
+    })
+      .then((doc) => {
+        if (!doc) {
+          return res.status(404).json({
+            success: false,
+            message: "Счет не найден",
+          });
+        }
+        res.json({
           success: true,
-          body: { ...checkDoc._doc },
         });
       })
-      .catch(async (err) => {
-        await session.abortTransaction();
-        console.log(err);
-        return res.status(500).json({
-          message: "Не удалось найти пользователя",
-        });
+      .catch((err) => {
+        return serverErrorHandler(res, err, "Не удалось удалить счет");
       });
   } catch (err) {
-    await session.abortTransaction();
-    console.log(err);
-    res.status(500).json({
-      message: "Не удалось создать счет",
-    });
-  } finally {
-    session.endSession();
+    serverErrorHandler(res, err, "Не удалось удалить счет");
   }
 };

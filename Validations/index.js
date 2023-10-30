@@ -18,10 +18,14 @@ export const loginValidation = [
 export const transactionCreateValidation = [
   body("type", "Неверный тип транзакции").isString(),
   body("shortDescription", "Введите краткое описание транзакции").isString(),
+  body(
+    "currency",
+    "Выберите валюту по которой была совершена транзакция"
+  ).isString(),
   body("amount", "Введите сумму транзакции").isFloat(),
   body("check", "Выберите счет").isString(),
-  body("date", "Выберите дату транзакции").isString(),
   body("category", "Выберите категорию транзакции").isString(),
+  body("time", "Выберите дату транзакции").isString(),
   body("fullDescription", "Не верный формат записи описания")
     .optional()
     .isString(),
@@ -30,5 +34,13 @@ export const transactionCreateValidation = [
 export const checkCreateValidation = [
   body("name", "Неверное имя счета").isString(),
   body("amount", "Неверное первоначальная сумма счета").isFloat(),
+  body("currency", "Выберите основную валюту счета").isString(),
   body("color", "Неправильный цвет").isHexColor(),
+];
+
+export const categoryCreateValidation = [
+  body("name", "Неверное имя категории").isString(),
+  body("type", "Неверный тип категории").isString(),
+  body("color", "Неправильный цвет").isHexColor(),
+  body("icon", "Неправильный иконка").optional().isString(),
 ];

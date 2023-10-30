@@ -2,18 +2,23 @@ import mongoose from "mongoose";
 
 const CheckSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      require: true,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       require: true,
     },
+    name: {
+      type: String,
+      require: true,
+    },
     amount: {
       type: Number,
-      default: 0,
+      require: true,
+    },
+    currency: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Currency",
+      require: true,
     },
     color: {
       type: String,
