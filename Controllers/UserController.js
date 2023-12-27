@@ -92,7 +92,7 @@ export const login = async (req, res) => {
     );
 
     if (!isValidPass) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: "Неверный логин или пароль",
       });
     }

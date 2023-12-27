@@ -1,5 +1,21 @@
 import { body } from "express-validator";
 
+const validationChainEmail = body("email")
+  .notEmpty()
+  .withMessage("Поле должно быть заполнено")
+  .trim()
+  .isEmail()
+  .withMessage("Неверный формат почты");
+
+const validationChainPassword = body("password")
+  .notEmpty()
+  .withMessage("Поле должно быть заполнено")
+  .isLength({
+    min: 6,
+    max: 128,
+  })
+  .withMessage("Пароль должен быть от 6 до 128 символов");
+
 export const signupValidation = [
   body("email", "Неверный формат почты").isEmail(),
   body("password", "Пароль должен быть минимум 6 символов").isLength({
@@ -8,12 +24,7 @@ export const signupValidation = [
   body("userName", "Укажите имя").isLength({ min: 3 }),
 ];
 
-export const loginValidation = [
-  body("email", "Неверный формат почты").isEmail(),
-  body("password", "Пароль должен быть минимум 6 символов").isLength({
-    min: 6,
-  }),
-];
+export const loginValidation = [validationChainEmail, validationChainPassword];
 
 export const transactionCreateValidation = [
   body("type", "Неверный тип транзакции").isString(),
