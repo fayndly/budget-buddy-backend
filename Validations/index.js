@@ -17,11 +17,16 @@ const validationChainPassword = body("password")
   .withMessage("Пароль должен быть от 6 до 128 символов");
 
 export const signupValidation = [
-  body("email", "Неверный формат почты").isEmail(),
-  body("password", "Пароль должен быть минимум 6 символов").isLength({
-    min: 6,
-  }),
-  body("userName", "Укажите имя").isLength({ min: 3 }),
+  validationChainEmail,
+  validationChainPassword,
+  body("userName")
+    .notEmpty()
+    .withMessage("Поле должно быть заполнено")
+    .isLength({
+      min: 2,
+      max: 24,
+    })
+    .withMessage("Пароль должен быть от 2 до 24 символов"),
 ];
 
 export const loginValidation = [validationChainEmail, validationChainPassword];
