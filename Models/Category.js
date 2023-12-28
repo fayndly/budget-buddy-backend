@@ -23,6 +23,10 @@ const CategorySchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    isSpecial: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

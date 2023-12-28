@@ -6,38 +6,10 @@ import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 import UserModel from "../Models/User.js";
 import CategoryModel from "../Models/Category.js";
 
+import { getDefaultCategories } from "../mocks/categories.js";
+
 const createDefaultCategories = async (user) => {
-  const defaultCategories = [
-    {
-      user,
-      name: "Продукты",
-      type: "expense",
-      color: "#1a1a1a",
-      icon: "icon-category-expense",
-    },
-    {
-      user,
-      name: "Транспорт",
-      type: "expense",
-      color: "#1a1a1a",
-      icon: "icon-category-expense",
-    },
-    {
-      user,
-      name: "Зарплата",
-      type: "income",
-      color: "#1a1a1a",
-      icon: "icon-category-income",
-    },
-    {
-      user,
-      name: "Инвестиции",
-      type: "income",
-      color: "#1a1a1a",
-      icon: "icon-category-income",
-    },
-  ];
-  await CategoryModel.insertMany(defaultCategories).catch(() => {
+  await CategoryModel.insertMany(getDefaultCategories(user)).catch(() => {
     throw new Error("Не удалось создать категории по умолчанию");
   });
 };
@@ -55,7 +27,7 @@ export const signup = async (req, res) => {
 
     const user = await docUser.save();
 
-    createDefaultCategories(user);
+    await createDefaultCategories(user);
 
     const token = jwt.sign(
       {

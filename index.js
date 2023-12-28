@@ -48,7 +48,7 @@ app.post(
   handleValidationErrors,
   UserController.login
 );
-app.get("/auth/check", checkAuth, UserController.getCheckMe);
+app.get("/auth/me", checkAuth, UserController.getCheckMe);
 
 // transactions
 app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
