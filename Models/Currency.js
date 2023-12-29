@@ -6,6 +6,14 @@ const CurrencySchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+    symbol: {
+      type: String,
+      require: true,
+    },
+    designation: {
+      type: String,
+      require: true,
+    },
   },
   {
     timestamps: true,

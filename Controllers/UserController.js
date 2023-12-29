@@ -6,6 +6,7 @@ import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 import UserModel from "../Models/User.js";
 import CategoryModel from "../Models/Category.js";
 import CheckModel from "../Models/Check.js";
+import CurrencyModel from "../Models/Currency.js";
 
 import { getDefaultCategories } from "../mocks/categories.js";
 import { getDefaultChecks } from "../mocks/checks.js";
@@ -35,8 +36,14 @@ export const signup = async (req, res) => {
 
     const user = await docUser.save();
 
+    let defaultCurrency = await CurrencyModel.findOne({
+      name: "RUB",
+    });
+
+    if (!defaultCurrency) defaultCurrency = CurrencyModel.find()[0];
+
     await createDefaultCategories(user);
-    await createDefaultChecks(user, "653698b1a2cb054a9a95f3e1");
+    await createDefaultChecks(user, defaultCurrency._id);
 
     const token = jwt.sign(
       {
