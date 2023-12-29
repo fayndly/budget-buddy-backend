@@ -5,12 +5,20 @@ import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 
 import UserModel from "../Models/User.js";
 import CategoryModel from "../Models/Category.js";
+import CheckModel from "../Models/Check.js";
 
 import { getDefaultCategories } from "../mocks/categories.js";
+import { getDefaultChecks } from "../mocks/checks.js";
 
 const createDefaultCategories = async (user) => {
   await CategoryModel.insertMany(getDefaultCategories(user)).catch(() => {
     throw new Error("Не удалось создать категории по умолчанию");
+  });
+};
+
+const createDefaultChecks = async (user, currency) => {
+  await CheckModel.insertMany(getDefaultChecks(user, currency)).catch(() => {
+    throw new Error("Не удалось создать счет по умолчанию");
   });
 };
 
@@ -28,6 +36,7 @@ export const signup = async (req, res) => {
     const user = await docUser.save();
 
     await createDefaultCategories(user);
+    await createDefaultChecks(user, "653698b1a2cb054a9a95f3e1");
 
     const token = jwt.sign(
       {

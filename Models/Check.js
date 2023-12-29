@@ -20,10 +20,6 @@ const CheckSchema = new mongoose.Schema(
       ref: "Currency",
       require: true,
     },
-    color: {
-      type: String,
-      require: true,
-    },
     transactions: {
       expense: [
         {
