@@ -1,9 +1,9 @@
 import { body } from "express-validator";
 
 const validationChainEmail = body("email")
+  .trim()
   .notEmpty()
   .withMessage("Поле должно быть заполнено")
-  .trim()
   .isEmail()
   .withMessage("Неверный формат почты");
 
@@ -15,6 +15,17 @@ const validationChainPassword = body("password")
     max: 128,
   })
   .withMessage("Пароль должен быть от 6 до 128 символов");
+
+const validationChainName = body("name")
+  .notEmpty()
+  .withMessage("Поле должно быть заполнено")
+  .isString()
+  .withMessage("Поле должно быть строкой")
+  .isLength({
+    min: 2,
+    max: 24,
+  })
+  .withMessage("Поле должно содержать от 2 до 24 символов");
 
 export const signupValidation = [
   validationChainEmail,
@@ -48,10 +59,21 @@ export const transactionCreateValidation = [
 ];
 
 export const checkCreateValidation = [
-  body("name", "Неверное имя счета").isString(),
-  body("amount", "Неверное первоначальная сумма счета").isFloat(),
-  body("currency", "Выберите основную валюту счета").isString(),
-  body("color", "Неправильный цвет").isHexColor(),
+  validationChainName,
+  body("amount")
+    .trim()
+    .notEmpty()
+    .withMessage("Поле должно быть заполнено")
+    .isFloat({
+      min: 0,
+    })
+    .withMessage("Поле должно быть десятичным числом и не меньше нуля"),
+  body("currency", "Выберите основную валюту счета")
+    .trim()
+    .notEmpty()
+    .withMessage("Поле должно быть заполнено")
+    .isString()
+    .withMessage("Поле должно быть строкой"),
 ];
 
 export const categoryCreateValidation = [

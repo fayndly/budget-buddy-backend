@@ -1,23 +1,18 @@
 import mongoose from "mongoose";
 
-const CurrencySchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      require: true,
-    },
-    symbol: {
-      type: String,
-      require: true,
-    },
-    designation: {
-      type: String,
-      require: true,
-    },
+const CurrencySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    require: true,
   },
-  {
-    timestamps: true,
-  }
-);
+  symbol: {
+    type: String,
+    require: true,
+  },
+  designation: {
+    type: String,
+    require: true,
+  },
+});
 
 export default mongoose.model("Currency", CurrencySchema);

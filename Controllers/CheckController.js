@@ -9,7 +9,6 @@ export const create = async (req, res) => {
       name: req.body.name,
       amount: req.body.amount,
       currency: req.body.currency,
-      color: req.body.color,
       transactions: {
         expense: [],
         income: [],
@@ -18,9 +17,7 @@ export const create = async (req, res) => {
 
     await checkDoc.save();
 
-    res.json({
-      success: true,
-    });
+    res.json(checkDoc);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось создать счет");
   }
@@ -41,7 +38,22 @@ export const getAll = async (req, res) => {
 
 export const getOneById = async (req, res) => {
   try {
-    const check = await CheckModel.findById(req.params.id);
+    const check = await CheckModel.findById(req.params.id).populate({
+      path: "currency",
+      options: { strictPopulate: false },
+    });
+
+    if (!check) {
+      return res.status(404).json({
+        message: "Не удалось найти счет",
+      });
+    }
+
+    if (check.user.toString() !== req.userId) {
+      return res.status(403).json({
+        message: "У вас нет доступа к этому счету",
+      });
+    }
 
     res.json(check);
   } catch (err) {
@@ -54,24 +66,30 @@ export const update = async (req, res) => {
     await CheckModel.updateOne(
       {
         _id: req.params.id,
+        user: req.userId,
       },
       {
         name: req.body.name,
         amount: req.body.amount,
         currency: req.body.currency,
-        color: req.body.color,
       }
-    ).catch((err) => {
-      console.log(err);
-      res.status(404).json({
-        success: false,
-        message: "Не удалось найти счет",
+    )
+      .then(async () => {
+        await CheckModel.findById(req.params.id)
+          .then((doc) => {
+            res.json(doc);
+          })
+          .catch(() => {
+            res.status(404).json({
+              message: "Не удалось найти обновленный счет",
+            });
+          });
+      })
+      .catch(() => {
+        res.status(404).json({
+          message: "Не удалось найти счет",
+        });
       });
-    });
-
-    res.json({
-      success: true,
-    });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось обновить счет");
   }
@@ -81,20 +99,17 @@ export const remove = async (req, res) => {
   try {
     await CheckModel.findOneAndDelete({
       _id: req.params.id,
+      user: req.userId,
     })
       .then((doc) => {
-        if (!doc) {
-          return res.status(404).json({
-            success: false,
-            message: "Счет не найден",
-          });
-        }
         res.json({
-          success: true,
+          _id: doc._id,
         });
       })
-      .catch((err) => {
-        return serverErrorHandler(res, err, "Не удалось удалить счет");
+      .catch(() => {
+        res.status(404).json({
+          message: "Не удалось найти счет",
+        });
       });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить счет");
