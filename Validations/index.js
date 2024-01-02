@@ -1,5 +1,15 @@
 import { body } from "express-validator";
 
+function isValidObjectId(str) {
+  str = str + "";
+  var len = str.length,
+    valid = false;
+  if (len == 12 || len == 24) {
+    valid = /^[0-9a-fA-F]+$/.test(str);
+  }
+  return valid;
+}
+
 const validationChainEmail = body("email")
   .trim()
   .notEmpty()
@@ -73,7 +83,9 @@ export const checkCreateValidation = [
     .notEmpty()
     .withMessage("Поле должно быть заполнено")
     .isString()
-    .withMessage("Поле должно быть строкой"),
+    .withMessage("Поле должно быть строкой")
+    .custom((val) => isValidObjectId(val))
+    .withMessage("Неверный формат"),
 ];
 
 export const categoryCreateValidation = [
