@@ -17,6 +17,10 @@ export const create = async (req, res) => {
 
     await checkDoc.save();
 
+    return res.status(404).json({
+      message: "Не удалось создать счет",
+    });
+
     res.json(checkDoc);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось создать счет");
