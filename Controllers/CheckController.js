@@ -17,10 +17,6 @@ export const create = async (req, res) => {
 
     await checkDoc.save();
 
-    return res.status(404).json({
-      message: "Не удалось создать счет",
-    });
-
     res.json(checkDoc);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось создать счет");
@@ -29,10 +25,7 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const checks = await CheckModel.find({ user: req.userId }).populate({
-      path: "currency",
-      options: { strictPopulate: false },
-    });
+    const checks = await CheckModel.find({ user: req.userId });
 
     res.json(checks);
   } catch (err) {
@@ -42,10 +35,7 @@ export const getAll = async (req, res) => {
 
 export const getOneById = async (req, res) => {
   try {
-    const check = await CheckModel.findById(req.params.id).populate({
-      path: "currency",
-      options: { strictPopulate: false },
-    });
+    const check = await CheckModel.findById(req.params.id);
 
     if (!check) {
       return res.status(404).json({
@@ -107,7 +97,7 @@ export const remove = async (req, res) => {
     })
       .then((doc) => {
         res.json({
-          _id: doc._id,
+          id: doc._id,
         });
       })
       .catch(() => {

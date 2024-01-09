@@ -14,9 +14,7 @@ export const create = async (req, res) => {
 
     await categoryDoc.save();
 
-    res.json({
-      success: true,
-    });
+    res.json(categoryDoc);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось создать категорию");
   }
@@ -49,5 +47,61 @@ export const getOneById = async (req, res) => {
     res.json(category);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось найти категорию");
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    await CategoryModel.updateOne(
+      {
+        _id: req.params.id,
+        user: req.userId,
+      },
+      {
+        name: req.body.name,
+        type: req.body.type,
+        color: req.body.color,
+        icon: req.body.icon,
+      }
+    )
+      .then(async () => {
+        await CategoryModel.findById(req.params.id)
+          .then((doc) => {
+            res.json(doc);
+          })
+          .catch(() => {
+            res.status(404).json({
+              message: "Не удалось найти обновленный категорию",
+            });
+          });
+      })
+      .catch(() => {
+        res.status(404).json({
+          message: "Не удалось найти категорию",
+        });
+      });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось обновить категорию");
+  }
+};
+
+export const remove = async (req, res) => {
+  try {
+    await CategoryModel.findOneAndDelete({
+      _id: req.params.id,
+      user: req.userId,
+    })
+      .then((doc) => {
+        res.json({
+          id: doc._id,
+        });
+      })
+      .catch(() => {
+        res.status(404).json({
+          message: "Не удалось найти категорию",
+        });
+      });
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось удалить категорию");
   }
 };

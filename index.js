@@ -51,56 +51,64 @@ app.post(
 app.get("/auth/me", checkAuth, UserController.getCheckMe);
 
 // transactions
-app.get("/transactions", checkAuth, TransactionController.getAll); // get all transactions
-app.get("/transactions/:id", checkAuth, TransactionController.getOneById); // get by id transactions
+app.get("/transactions", checkAuth, TransactionController.getAll);
+app.get("/transactions/:id", checkAuth, TransactionController.getOneById);
 app.post(
   "/transactions",
   checkAuth,
   transactionCreateValidation,
   handleValidationErrors,
   TransactionController.create
-); // create transaction
+);
 app.patch(
   "/transactions/:id",
   checkAuth,
   transactionCreateValidation,
   handleValidationErrors,
   TransactionController.update
-); // update transaction
-app.delete("/transactions/:id", checkAuth, TransactionController.remove); // remove transaction
+);
+app.delete("/transactions/:id", checkAuth, TransactionController.remove);
 
 // checks
-app.get("/checks", checkAuth, CheckController.getAll); // get all checks
-app.get("/checks/:id", checkAuth, CheckController.getOneById); // get all checks
+app.get("/checks", checkAuth, CheckController.getAll);
+app.get("/checks/:id", checkAuth, CheckController.getOneById);
 app.post(
   "/checks",
   checkAuth,
   checkCreateValidation,
   handleValidationErrors,
   CheckController.create
-); // create check
+);
 app.patch(
   "/checks/:id",
   checkAuth,
   checkCreateValidation,
   handleValidationErrors,
   CheckController.update
-); // update check
-app.delete("/checks/:id", checkAuth, CheckController.remove); // remove check
+);
+app.delete("/checks/:id", checkAuth, CheckController.remove);
 
 // categories
-app.get("/categories", checkAuth, CategoryController.getAll); // get all categories
-app.get("/categories/:id", checkAuth, CategoryController.getOneById); // get all categories
+app.get("/categories", checkAuth, CategoryController.getAll);
+app.get("/categories/:id", checkAuth, CategoryController.getOneById);
 app.post(
   "/categories",
   checkAuth,
   categoryCreateValidation,
   handleValidationErrors,
   CategoryController.create
-); // create category'
+);
+app.patch(
+  "/categories/:id",
+  checkAuth,
+  categoryCreateValidation,
+  handleValidationErrors,
+  CategoryController.update
+);
+app.delete("/categories/:id", checkAuth, CategoryController.remove);
 
 // currencies
-app.get("/currencies", checkAuth, CurrencyController.getAll); // get all currencies
+app.get("/currencies", checkAuth, CurrencyController.getAll);
 
 app.listen(process.env.PORT, (err) => {
   if (err) {
