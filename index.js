@@ -13,7 +13,11 @@ import {
   categoryCreateValidation,
 } from "./Validations/index.js";
 
-import { handleValidationErrors, checkAuth } from "./Utils/index.js";
+import {
+  handleValidationErrors,
+  checkAuth,
+  checkValidId,
+} from "./Utils/index.js";
 
 import {
   UserController,
@@ -52,7 +56,12 @@ app.get("/auth/me", checkAuth, UserController.getCheckMe);
 
 // transactions
 app.get("/transactions", checkAuth, TransactionController.getAll);
-app.get("/transactions/:id", checkAuth, TransactionController.getOneById);
+app.get(
+  "/transactions/:id",
+  checkAuth,
+  checkValidId,
+  TransactionController.getOneById
+);
 app.post(
   "/transactions",
   checkAuth,
@@ -63,15 +72,21 @@ app.post(
 app.patch(
   "/transactions/:id",
   checkAuth,
+  checkValidId,
   transactionCreateValidation,
   handleValidationErrors,
   TransactionController.update
 );
-app.delete("/transactions/:id", checkAuth, TransactionController.remove);
+app.delete(
+  "/transactions/:id",
+  checkAuth,
+  checkValidId,
+  TransactionController.remove
+);
 
 // checks
 app.get("/checks", checkAuth, CheckController.getAll);
-app.get("/checks/:id", checkAuth, CheckController.getOneById);
+app.get("/checks/:id", checkAuth, checkValidId, CheckController.getOneById);
 app.post(
   "/checks",
   checkAuth,
@@ -82,15 +97,21 @@ app.post(
 app.patch(
   "/checks/:id",
   checkAuth,
+  checkValidId,
   checkCreateValidation,
   handleValidationErrors,
   CheckController.update
 );
-app.delete("/checks/:id", checkAuth, CheckController.remove);
+app.delete("/checks/:id", checkAuth, checkValidId, CheckController.remove);
 
 // categories
 app.get("/categories", checkAuth, CategoryController.getAll);
-app.get("/categories/:id", checkAuth, CategoryController.getOneById);
+app.get(
+  "/categories/:id",
+  checkAuth,
+  checkValidId,
+  CategoryController.getOneById
+);
 app.post(
   "/categories",
   checkAuth,
@@ -101,11 +122,17 @@ app.post(
 app.patch(
   "/categories/:id",
   checkAuth,
+  checkValidId,
   categoryCreateValidation,
   handleValidationErrors,
   CategoryController.update
 );
-app.delete("/categories/:id", checkAuth, CategoryController.remove);
+app.delete(
+  "/categories/:id",
+  checkAuth,
+  checkValidId,
+  CategoryController.remove
+);
 
 // currencies
 app.get("/currencies", checkAuth, CurrencyController.getAll);
