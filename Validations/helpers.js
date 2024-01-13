@@ -10,10 +10,5 @@ export const isValidObjectId = (str) => {
   return valid;
 };
 
-export const isValidType = (val) => {
-  return val === "expense" || val === "income";
-};
-
-export const isValidIcon = (val) => {
-  return materialIcons.includes(val);
-};
+export const isValidType = (val) => val === "expense" || val === "income";
+export const isValidIcon = (val) => materialIcons.includes(val);

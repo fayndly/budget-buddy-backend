@@ -46,9 +46,7 @@ export const create = async (req, res) => {
     await check.save({ session });
 
     await session.commitTransaction();
-    res.json({
-      success: true,
-    });
+    res.json(transaction);
   } catch (err) {
     await session.abortTransaction();
     serverErrorHandler(res, err, "Не удалось создать транзакцию");
@@ -59,24 +57,7 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    let transactions = await TransactionModel.find({ user: req.userId })
-      .populate({
-        path: "check",
-        options: { strictPopulate: false },
-        select:
-          "-transactions -user -amount -currency -color -createdAt -updatedAt -__v",
-      })
-      .populate({
-        path: "category",
-        options: { strictPopulate: false },
-        select: "-createdAt -updatedAt -__v -user",
-      })
-      .populate({
-        path: "currency",
-        options: { strictPopulate: false },
-        select: "-createdAt -updatedAt -__v",
-      })
-      .exec();
+    let transactions = await TransactionModel.find({ user: req.userId }).exec();
 
     if (!transactions.length) {
       return res.json(transactions);
@@ -108,24 +89,7 @@ export const getAll = async (req, res) => {
 
 export const getOneById = async (req, res) => {
   try {
-    const transaction = await TransactionModel.findById(req.params.id)
-      .populate({
-        path: "check",
-        options: { strictPopulate: false },
-        select:
-          "-transactions -user -amount -currency -color -createdAt -updatedAt -__v",
-      })
-      .populate({
-        path: "category",
-        options: { strictPopulate: false },
-        select: "-createdAt -updatedAt -__v -user",
-      })
-      .populate({
-        path: "currency",
-        options: { strictPopulate: false },
-        select: "-createdAt -updatedAt -__v",
-      })
-      .exec();
+    const transaction = await TransactionModel.findById(req.params.id).exec();
 
     res.json(transaction);
   } catch (err) {
@@ -139,7 +103,6 @@ export const update = async (req, res) => {
 
     if (!transaction) {
       return res.status(404).json({
-        success: false,
         message: "Не удалось найти транзакцию",
       });
     }
@@ -157,7 +120,6 @@ export const update = async (req, res) => {
 
       if (!newCheck || !oldCheck) {
         return res.status(404).json({
-          success: false,
           message: "Не удалось найти счет",
         });
       }
@@ -174,9 +136,7 @@ export const update = async (req, res) => {
       updateCheckAmount(oldTransaction.check.toString());
       updateCheckAmount(transaction.check.toString());
 
-      return res.json({
-        success: true,
-      });
+      return res.json(transaction);
     }
 
     if (oldTransaction.type !== transaction.type) {
@@ -204,9 +164,7 @@ export const update = async (req, res) => {
 
       updateCheckAmount(check._id.toString());
 
-      return res.json({
-        success: true,
-      });
+      return res.json(transaction);
     }
 
     if (oldTransaction.amount !== transaction.amount) {
@@ -221,14 +179,10 @@ export const update = async (req, res) => {
 
       updateCheckAmount(check._id.toString());
 
-      return res.json({
-        success: true,
-      });
+      return res.json(transaction);
     }
 
-    return res.json({
-      success: true,
-    });
+    return res.json(transaction);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось обновить транзакцию");
   }
@@ -242,8 +196,7 @@ export const remove = async (req, res) => {
       .then(async (doc) => {
         if (!doc) {
           return res.status(404).json({
-            success: false,
-            message: "Транзакция не найдена",
+            message: "Не удалось найти транзакцию",
           });
         }
 
@@ -251,7 +204,6 @@ export const remove = async (req, res) => {
 
         if (!check) {
           return res.status(404).json({
-            success: false,
             message: "Не удалось найти счет",
           });
         }
@@ -262,7 +214,7 @@ export const remove = async (req, res) => {
         updateCheckAmount(check._id.toString());
 
         res.json({
-          success: true,
+          id: doc._id,
         });
       })
       .catch((err) => {
