@@ -1,50 +1,25 @@
-import { body } from "express-validator";
+import { validationChain as chain } from "./chains.js";
 
-import {
-  validationChainEmail,
-  validationChainPassword,
-  validationChainName,
-  validationChainType,
-  validationChainColor,
-  validationChainUserName,
-  validationChainAmount,
-  validationChainCurrency,
-  validationChainIcon,
-} from "./chains.js";
+export const signupValidation = [chain.email, chain.password, chain.userName];
 
-export const signupValidation = [
-  validationChainEmail,
-  validationChainPassword,
-  validationChainUserName,
-];
-
-export const loginValidation = [validationChainEmail, validationChainPassword];
+export const loginValidation = [chain.email, chain.password];
 
 export const transactionCreateValidation = [
-  body("type", "Неверный тип транзакции").isString(),
-  body("shortDescription", "Введите краткое описание транзакции").isString(),
-  body(
-    "currency",
-    "Выберите валюту по которой была совершена транзакция"
-  ).isString(),
-  body("amount", "Введите сумму транзакции").isFloat(),
-  body("check", "Выберите счет").isString(),
-  body("category", "Выберите категорию транзакции").isString(),
-  body("time", "Выберите дату транзакции").isString(),
-  body("fullDescription", "Не верный формат записи описания")
-    .optional()
-    .isString(),
+  chain.type,
+  chain.name,
+  chain.currency,
+  chain.amount,
+  chain.check,
+  chain.category,
+  chain.time,
+  chain.description,
 ];
 
-export const checkCreateValidation = [
-  validationChainName,
-  validationChainAmount,
-  validationChainCurrency,
-];
+export const checkCreateValidation = [chain.name, chain.amount, chain.currency];
 
 export const categoryCreateValidation = [
-  validationChainName,
-  validationChainType,
-  validationChainColor,
-  validationChainIcon,
+  chain.name,
+  chain.type,
+  chain.color,
+  chain.icon,
 ];
