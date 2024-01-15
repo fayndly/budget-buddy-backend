@@ -136,6 +136,12 @@ app.delete(
 
 // currencies
 app.get("/currencies", checkAuth, CurrencyController.getAll);
+app.get(
+  "/currencies/:id",
+  checkAuth,
+  checkValidId,
+  CurrencyController.getOneById
+);
 
 app.listen(process.env.PORT, (err) => {
   if (err) {

@@ -44,6 +44,12 @@ export const getOneById = async (req, res) => {
   try {
     const category = await CategoryModel.findById(req.params.id);
 
+    if (!category) {
+      return res.status(404).json({
+        message: "Не удалось найти категорию",
+      });
+    }
+
     res.json(category);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось найти категорию");
@@ -87,20 +93,26 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    await CategoryModel.findOneAndDelete({
+    const category = await CategoryModel.findOne({
       _id: req.params.id,
       user: req.userId,
-    })
-      .then((doc) => {
-        res.json({
-          id: doc._id,
-        });
-      })
-      .catch(() => {
-        res.status(404).json({
-          message: "Не удалось найти категорию",
-        });
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Не удалось найти категорию",
       });
+    }
+
+    if (category.isSpecial) {
+      return res.status(403).json({
+        message: "Вы не можете удалить эту категорию",
+      });
+    }
+
+    res.json({
+      id: category._id,
+    });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить категорию");
   }

@@ -8,10 +8,10 @@ const TransactionSchema = new mongoose.Schema(
       require: true,
     },
     type: {
-      type: String, // "expense" || "income",
+      type: String,
       require: true,
     },
-    shortDescription: {
+    name: {
       type: String,
       require: true,
     },
@@ -38,7 +38,7 @@ const TransactionSchema = new mongoose.Schema(
       type: Date,
       require: true,
     },
-    fullDescription: String,
+    description: String,
   },
   {
     timestamps: true,

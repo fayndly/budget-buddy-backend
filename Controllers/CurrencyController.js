@@ -4,9 +4,18 @@ import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 
 export const getAll = async (_, res) => {
   try {
-    const checks = await CurrencyModel.find();
-    res.json(checks);
+    const currencies = await CurrencyModel.find();
+    res.json(currencies);
   } catch (err) {
-    serverErrorHandler(res, err, "Не удалось найти транзакции");
+    serverErrorHandler(res, err, "Не удалось найти валюты");
+  }
+};
+
+export const getOneById = async (req, res) => {
+  try {
+    const currency = await CurrencyModel.findById(req.params.id);
+    res.json(currency);
+  } catch (err) {
+    serverErrorHandler(res, err, "Не удалось найти валюту");
   }
 };
