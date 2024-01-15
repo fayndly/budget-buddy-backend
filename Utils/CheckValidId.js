@@ -5,12 +5,12 @@ export default (req, res, next) => {
     if (isValidObjectId(req.params.id)) {
       next();
     } else {
-      return res.status(403).json({
+      return res.status(404).json({
         message: "Не верный id",
       });
     }
   } catch (e) {
-    return res.status(403).json({
+    return res.status(404).json({
       message: "Не верный id",
     });
   }

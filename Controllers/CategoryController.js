@@ -24,12 +24,6 @@ export const getAll = async (req, res) => {
   try {
     let categories = await CategoryModel.find({ user: req.userId });
 
-    if (!categories.length) {
-      return res.status(404).json({
-        message: "Не удалось найти категорий",
-      });
-    }
-
     if (req.query.type) {
       categories = categories.filter((el) => el.type === req.query.type);
     }
@@ -42,7 +36,10 @@ export const getAll = async (req, res) => {
 
 export const getOneById = async (req, res) => {
   try {
-    const category = await CategoryModel.findById(req.params.id);
+    const category = await CategoryModel.findOne({
+      _id: req.params.id,
+      user: req.userId,
+    });
 
     if (!category) {
       return res.status(404).json({
@@ -58,11 +55,27 @@ export const getOneById = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
+    const category = await CategoryModel.findOne({
+      _id: req.params.id,
+      user: req.userId,
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Не удалось найти категорию",
+      });
+    }
+
+    if (category.isSpecial) {
+      return res.status(403).json({
+        message: "Вы не можете редактировать эту категорию",
+      });
+    }
+
+    if (req.body.icon === "null") req.body.icon = null;
+
     await CategoryModel.updateOne(
-      {
-        _id: req.params.id,
-        user: req.userId,
-      },
+      { _id: category._id, user: category.user },
       {
         name: req.body.name,
         type: req.body.type,
@@ -71,13 +84,13 @@ export const update = async (req, res) => {
       }
     )
       .then(async () => {
-        await CategoryModel.findById(req.params.id)
+        await CategoryModel.findById(category._id)
           .then((doc) => {
             res.json(doc);
           })
           .catch(() => {
             res.status(404).json({
-              message: "Не удалось найти обновленный категорию",
+              message: "Не удалось найти обновленную категорию",
             });
           });
       })
