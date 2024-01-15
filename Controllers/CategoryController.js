@@ -110,9 +110,17 @@ export const remove = async (req, res) => {
       });
     }
 
-    res.json({
-      id: category._id,
-    });
+    await CategoryModel.deleteOne({ _id: category._id, user: category.user })
+      .then(() => {
+        res.json({
+          id: category._id,
+        });
+      })
+      .catch(() => {
+        return res.status(404).json({
+          message: "Не удалось найти категорию",
+        });
+      });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить категорию");
   }
