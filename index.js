@@ -11,6 +11,7 @@ import {
   transactionCreateValidation,
   checkCreateValidation,
   categoryCreateValidation,
+  checkUpdateValidation,
 } from "./Validations/index.js";
 
 import {
@@ -98,7 +99,7 @@ app.patch(
   "/checks/:id",
   checkAuth,
   checkValidId,
-  checkCreateValidation,
+  checkUpdateValidation,
   handleValidationErrors,
   CheckController.update
 );

@@ -23,3 +23,5 @@ export const categoryCreateValidation = [
   chain.color,
   chain.icon,
 ];
+
+export const checkUpdateValidation = [chain.name, chain.currency];

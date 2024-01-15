@@ -35,17 +35,14 @@ export const getAll = async (req, res) => {
 
 export const getOneById = async (req, res) => {
   try {
-    const check = await CheckModel.findById(req.params.id);
+    const check = await CheckModel.findOne({
+      _id: req.params.id,
+      user: req.userId,
+    });
 
     if (!check) {
       return res.status(404).json({
         message: "Не удалось найти счет",
-      });
-    }
-
-    if (check.user.toString() !== req.userId) {
-      return res.status(403).json({
-        message: "У вас нет доступа к этому счету",
       });
     }
 
@@ -57,19 +54,29 @@ export const getOneById = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
+    const check = await CheckModel.findOne({
+      _id: req.params.id,
+      user: req.userId,
+    });
+
+    if (!check) {
+      return res.status(404).json({
+        message: "Не удалось найти счет",
+      });
+    }
+
     await CheckModel.updateOne(
       {
-        _id: req.params.id,
-        user: req.userId,
+        _id: check._id,
+        user: check.user,
       },
       {
         name: req.body.name,
-        amount: req.body.amount,
         currency: req.body.currency,
       }
     )
       .then(async () => {
-        await CheckModel.findById(req.params.id)
+        await CheckModel.findById(check._id)
           .then((doc) => {
             res.json(doc);
           })
@@ -91,17 +98,25 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    await CheckModel.findOneAndDelete({
+    const check = await CheckModel.findOne({
       _id: req.params.id,
       user: req.userId,
-    })
-      .then((doc) => {
+    });
+
+    if (!check) {
+      return res.status(404).json({
+        message: "Не удалось найти счет",
+      });
+    }
+
+    await CheckModel.deleteOne({ _id: check._id, user: check.user })
+      .then(() => {
         res.json({
-          id: doc._id,
+          id: check._id,
         });
       })
       .catch(() => {
-        res.status(404).json({
+        return res.status(404).json({
           message: "Не удалось найти счет",
         });
       });
