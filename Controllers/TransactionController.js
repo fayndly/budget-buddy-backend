@@ -19,11 +19,19 @@ export const create = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const transaction = new TransactionModel({
+    const transactionDoc = new TransactionModel({
       user: req.userId,
-      ...req.body,
+      type: req.body.type,
+      name: req.body.name,
+      currency: req.body.currency,
+      amount: req.body.amount,
+      check: req.body.check,
+      category: req.body.category,
+      time: req.body.time,
+      description: req.body.description,
     });
-    await transaction.save({ session });
+
+    await transactionDoc.save({ session });
 
     const check = await CheckModel.findById(req.body.check).session(session);
 
@@ -35,18 +43,19 @@ export const create = async (req, res) => {
       });
     }
 
-    check.transactions[req.body.type].push(transaction);
+    check.transactions[req.body.type].push(transactionDoc);
 
-    if (transaction.type === "expense") {
-      check.amount -= transaction.amount;
+    if (transactionDoc.type === "expense") {
+      check.amount -= transactionDoc.amount;
     } else if (req.body.type === "income") {
-      check.amount += transaction.amount;
+      check.amount += transactionDoc.amount;
     }
 
     await check.save({ session });
 
     await session.commitTransaction();
-    res.json(transaction);
+
+    res.json(transactionDoc);
   } catch (err) {
     await session.abortTransaction();
     serverErrorHandler(res, err, "Не удалось создать транзакцию");
@@ -57,11 +66,7 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    let transactions = await TransactionModel.find({ user: req.userId }).exec();
-
-    if (!transactions.length) {
-      return res.json(transactions);
-    }
+    let transactions = await TransactionModel.find({ user: req.userId });
 
     if (req.query.check) {
       transactions = transactions.filter(
@@ -89,7 +94,16 @@ export const getAll = async (req, res) => {
 
 export const getOneById = async (req, res) => {
   try {
-    const transaction = await TransactionModel.findById(req.params.id).exec();
+    const transaction = await TransactionModel.findOne({
+      _id: req.params.id,
+      user: req.userId,
+    });
+
+    if (!transaction) {
+      return res.status(404).json({
+        message: "Не удалось найти транзакцию",
+      });
+    }
 
     res.json(transaction);
   } catch (err) {
@@ -99,7 +113,10 @@ export const getOneById = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const transaction = await TransactionModel.findById(req.params.id);
+    const transaction = await TransactionModel.findOne({
+      _id: req.params.id,
+      user: req.userId,
+    });
 
     if (!transaction) {
       return res.status(404).json({
@@ -190,17 +207,23 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    await TransactionModel.findOneAndDelete({
+    const transaction = await TransactionModel.findOne({
       _id: req.params.id,
-    })
-      .then(async (doc) => {
-        if (!doc) {
-          return res.status(404).json({
-            message: "Не удалось найти транзакцию",
-          });
-        }
+      user: req.userId,
+    });
 
-        const check = await CheckModel.findById(doc.check.toString());
+    if (!transaction) {
+      return res.status(404).json({
+        message: "Не удалось найти транзакцию",
+      });
+    }
+
+    await TransactionModel.deleteOne({
+      _id: transaction._id,
+      user: transaction.user,
+    })
+      .then(async () => {
+        const check = await CheckModel.findById(transaction.check.toString());
 
         if (!check) {
           return res.status(404).json({
@@ -208,17 +231,21 @@ export const remove = async (req, res) => {
           });
         }
 
-        check.transactions[doc.type].findAndRemove(doc._id.toString());
+        check.transactions[transaction.type].findAndRemove(
+          transaction._id.toString()
+        );
 
         await check.save();
         updateCheckAmount(check._id.toString());
 
         res.json({
-          id: doc._id,
+          id: transaction._id,
         });
       })
-      .catch((err) => {
-        return serverErrorHandler(res, err, "Не удалось найти транзакцию");
+      .catch(() => {
+        return res.status(404).json({
+          message: "Не удалось найти транзакцию",
+        });
       });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить транзакцию");
