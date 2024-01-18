@@ -25,3 +25,19 @@ export const categoryCreateValidation = [
 ];
 
 export const checkUpdateValidation = [chain.name, chain.currency];
+export const transactionUpdateValidation = [
+  chain.type,
+  chain.name,
+  chain.currency,
+  chain.amount,
+  chain.check,
+  chain.category,
+  chain.time,
+  chain.description,
+];
+export const categoryUpdateValidation = [
+  chain.name,
+  chain.type,
+  chain.color,
+  chain.icon,
+];

@@ -22,7 +22,7 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const categories = await CategoryModel.find({ user: req.userId });
+    let categories = await CategoryModel.find({ user: req.userId });
 
     if (req.query.type) {
       categories = categories.filter((el) => el.type === req.query.type);

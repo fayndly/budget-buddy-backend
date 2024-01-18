@@ -89,7 +89,7 @@ export const validationChain = {
     .isString()
     .withMessage("Поле должно быть строкой")
     .isLength({
-      min: 1,
+      max: 256,
     })
-    .withMessage("Минимальная длина 1 символ"),
+    .withMessage("Максимальная длина 256 символ"),
 };

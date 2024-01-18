@@ -12,6 +12,8 @@ import {
   checkCreateValidation,
   categoryCreateValidation,
   checkUpdateValidation,
+  transactionUpdateValidation,
+  categoryUpdateValidation,
 } from "./Validations/index.js";
 
 import {
@@ -74,7 +76,7 @@ app.patch(
   "/transactions/:id",
   checkAuth,
   checkValidId,
-  transactionCreateValidation,
+  transactionUpdateValidation,
   handleValidationErrors,
   TransactionController.update
 );
@@ -124,7 +126,7 @@ app.patch(
   "/categories/:id",
   checkAuth,
   checkValidId,
-  categoryCreateValidation,
+  categoryUpdateValidation,
   handleValidationErrors,
   CategoryController.update
 );
