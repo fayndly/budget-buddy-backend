@@ -56,7 +56,6 @@ export const signup = async (req, res) => {
     );
 
     res.json({
-      success: true,
       token,
     });
   } catch (err) {
@@ -66,7 +65,7 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const user = await UserModel.findOne({ email: req.body.email });
+    const user = await UserModel.findOne({ email: req.body.email }).exec();
 
     if (!user) {
       return res.status(404).json({
@@ -96,7 +95,6 @@ export const login = async (req, res) => {
     );
 
     res.json({
-      success: true,
       token,
     });
   } catch (err) {
@@ -106,7 +104,7 @@ export const login = async (req, res) => {
 
 export const getCheckMe = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.userId);
+    const user = await UserModel.findById(req.userId).exec();
 
     if (!user) {
       return res.status(404).json({
@@ -114,9 +112,7 @@ export const getCheckMe = async (req, res) => {
       });
     }
 
-    const { passwordHash, ...userData } = user._doc;
-
-    res.json(userData);
+    res.json({ id: user._id });
   } catch (err) {
     serverErrorHandler(res, err, "Нет доступа");
   }

@@ -1,6 +1,6 @@
-export default (res, err, message, status = 500) => {
-  console.log(err);
+export default (res, err, message = null, status = 500) => {
   return res.status(status).json({
-    message,
+    message: message || err.message,
+    error: Object.keys(err).length !== 0 ? err : err.toString(),
   });
 };

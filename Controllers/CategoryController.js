@@ -2,6 +2,9 @@ import CategoryModel from "../Models/Category.js";
 
 import serverErrorHandler from "../Utils/ServerErrorHandler.js";
 
+import { strToBool } from "../Utils/StrtoBool.js";
+import { getFakeId } from "../Utils/GetFakeId.js";
+
 export const create = async (req, res) => {
   try {
     const categoryDoc = new CategoryModel({
@@ -20,36 +23,57 @@ export const create = async (req, res) => {
   }
 };
 
-export const getAll = async (req, res) => {
+export const getOneById = async (req, res) => {
   try {
-    let categories = await CategoryModel.find({ user: req.userId });
+    const category = CategoryModel.findById(req.params.id);
 
-    if (req.query.type) {
-      categories = categories.filter((el) => el.type === req.query.type);
-    }
+    await category
+      .exec()
+      .then((data) => {
+        if (data.user.toString() !== req.userId) {
+          return res
+            .status(403)
+            .json({ message: "У вас не доступа к этой категории" });
+        }
 
-    res.json(categories);
+        res.json(data);
+      })
+      .catch((err) => {
+        if (err.name === "CastError") {
+          return res.status(404).json({
+            message: "Не удалось найти категорию",
+            error: err,
+          });
+        }
+        serverErrorHandler(res, err, "Не удалось получить категорию");
+      });
   } catch (err) {
-    serverErrorHandler(res, err, "Не удалось найти категории");
+    serverErrorHandler(res, err, "Не удалось получить категорию");
   }
 };
 
-export const getOneById = async (req, res) => {
+export const getAll = async (req, res) => {
   try {
-    const category = await CategoryModel.findOne({
-      _id: req.params.id,
+    const filter = {
       user: req.userId,
-    });
+    };
 
-    if (!category) {
-      return res.status(404).json({
-        message: "Не удалось найти категорию",
-      });
+    if (req.query.filter) {
+      if (req.query.filter.type) filter.type = req.query.filter.type;
     }
 
-    res.json(category);
+    const categories = CategoryModel.find(filter);
+
+    await categories
+      .exec()
+      .then((data) => {
+        res.json(data);
+      })
+      .catch((err) => {
+        serverErrorHandler(res, err, "Не удалось получить категории");
+      });
   } catch (err) {
-    serverErrorHandler(res, err, "Не удалось найти категорию");
+    serverErrorHandler(res, err, "Не удалось получить категории");
   }
 };
 
@@ -106,15 +130,18 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const category = await CategoryModel.findOne({
-      _id: req.params.id,
-      user: req.userId,
-    });
+    const category = await CategoryModel.findById(req.params.id);
 
     if (!category) {
       return res.status(404).json({
         message: "Не удалось найти категорию",
       });
+    }
+
+    if (category.user.toString() !== req.userId) {
+      return res
+        .status(403)
+        .json({ message: "У вас не доступа к этой категории" });
     }
 
     if (category.isSpecial) {
@@ -123,16 +150,20 @@ export const remove = async (req, res) => {
       });
     }
 
-    await CategoryModel.deleteOne({ _id: category._id, user: category.user })
-      .then(() => {
+    await CategoryModel.findByIdAndDelete(category._id)
+      .then((data) => {
+        if (!data) {
+          return res.status(404).json({
+            message: "Не удалось найти категорию",
+          });
+        }
+
         res.json({
-          id: category._id,
+          id: data._id,
         });
       })
-      .catch(() => {
-        return res.status(404).json({
-          message: "Не удалось найти категорию",
-        });
+      .catch((err) => {
+        serverErrorHandler(res, err, "Не удалось удалить категорию");
       });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить категорию");

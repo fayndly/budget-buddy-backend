@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
-const CheckSchema = new mongoose.Schema(
+const CheckSchema = new Schema(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       require: true,
     },
@@ -16,28 +16,26 @@ const CheckSchema = new mongoose.Schema(
       require: true,
     },
     currency: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Currency",
       require: true,
     },
     transactions: {
       expense: [
         {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: "Transaction",
         },
       ],
       income: [
         {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: "Transaction",
         },
       ],
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model("Check", CheckSchema);
+export default model("Check", CheckSchema);
