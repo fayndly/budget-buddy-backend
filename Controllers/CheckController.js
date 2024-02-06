@@ -105,22 +105,14 @@ export const update = async (req, res) => {
         .json({ message: "У вас не доступа к этому счету" });
     }
 
-    await CheckModel.findByIdAndUpdate(
-      check._id,
-      {
-        name: req.body.name,
-        currency: req.body.currency,
-      },
-      { new: true }
-    ).then((data) => {
-      if (!data) {
-        return res.status(404).json({
-          message: "Не удалось найти счет",
-        });
-      }
-
-      res.json(data);
+    check.set({
+      name: req.body.name,
+      currency: req.body.currency,
     });
+
+    await check.save();
+
+    res.json(check);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось обновить счет");
   }

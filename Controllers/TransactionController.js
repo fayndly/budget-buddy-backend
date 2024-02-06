@@ -148,176 +148,79 @@ export const update = async (req, res) => {
         .json({ message: "У вас не доступа к этой транзакции" });
     }
 
-    await TransactionModel.findByIdAndUpdate(
-      transaction._id,
-      {
-        type: req.body.type,
-        name: req.body.name,
-        currency: req.body.currency,
-        amount: req.body.amount,
-        check: req.body.check,
-        category: req.body.category,
-        time: req.body.time,
-        description: req.body.description,
-      },
-      {
-        new: true,
+    transaction.set({
+      name: req.body.name,
+      currency: req.body.currency,
+      category: req.body.category,
+      time: req.body.time,
+      description: req.body.description,
+    });
+
+    if (transaction.amount !== req.body.amount) {
+      const check = await CheckModel.findById(transaction.check);
+
+      transaction.amount = req.body.amount;
+      await transaction.save();
+      if (check) {
+        updateCheckAmount(check._id);
       }
-    ).then(async (newTransaction) => {
-      if (transaction.check.toString() !== newTransaction.check.toString()) {
-        const oldCheck = await CheckModel.findById(
-          transaction.check.toString()
-        );
+    }
 
-        const newCheck = await CheckModel.findById(
-          newTransaction.check.toString()
-        );
+    if (transaction.type !== req.body.type) {
+      const check = await CheckModel.findById(transaction.check);
 
-        if (!newCheck || !oldCheck) {
-          return res.status(404).json({
-            message: "Не удалось найти счет",
-          });
-        }
+      transaction.type = req.body.type;
 
-        const oldTransactions = oldCheck.transactions[transaction.type];
-        const newTransactions = newCheck.transactions[newTransaction.type];
-
-        oldTransactions.findAndRemove(transaction._id);
-        newTransactions.push(newTransaction._id);
-
-        await oldCheck.save();
-        await newCheck.save();
-
-        updateCheckAmount(transaction.check.toString());
-        updateCheckAmount(newTransaction.check.toString());
-
-        return res.json(newTransaction);
-      }
-
-      if (transaction.type !== newTransaction.type) {
-        const check = await CheckModel.findById(
-          newTransaction.check.toString()
-        );
-
-        if (!check) {
-          return res.status(404).json({
-            success: false,
-            message: "Не удалось найти счет",
-          });
-        }
-
+      if (check) {
         const transactionsIncome = check.transactions.income;
         const transactionsExpense = check.transactions.expense;
 
-        if (newTransaction.type === "expense") {
-          transactionsIncome.findAndRemove(newTransaction._id);
-          transactionsExpense.push(newTransaction);
-        } else if (newTransaction.type === "income") {
-          transactionsExpense.findAndRemove(newTransaction._id);
-          transactionsIncome.push(newTransaction);
+        if (req.body.type === "expense") {
+          transactionsIncome.findAndRemove(transaction._id);
+          transactionsExpense.push(transaction);
+        } else if (req.body.type === "income") {
+          transactionsExpense.findAndRemove(transaction._id);
+          transactionsIncome.push(transaction);
         }
 
         await check.save();
 
-        updateCheckAmount(check._id.toString());
-
-        return res.json(newTransaction);
+        updateCheckAmount(check._id);
       }
 
-      if (transaction.amount !== newTransaction.amount) {
-        const check = await CheckModel.findById(
-          newTransaction.check.toString()
-        );
+      await transaction.save();
+    }
 
-        if (!check) {
-          return res.status(404).json({
-            success: false,
-            message: "Не удалось найти счет",
-          });
-        }
+    if (transaction.check.toString() !== req.body.check) {
+      const oldCheck = await CheckModel.findById(transaction.check);
+      const newCheck = await CheckModel.findById(req.body.check);
 
-        updateCheckAmount(check._id.toString());
+      transaction.check = req.body.check;
 
-        return res.json(newTransaction);
+      if (oldCheck) {
+        const oldTransactions = oldCheck.transactions[transaction.type];
+        oldTransactions.findAndRemove(transaction._id);
+        await oldCheck.save();
+        await updateCheckAmount(oldCheck._id);
       }
-    });
 
-    // const oldTransaction = { ...transaction.toObject() };
+      if (newCheck) {
+        const newTransactions = newCheck.transactions[transaction.type];
+        newTransactions.push(transaction._id);
+        await newCheck.save();
+        await updateCheckAmount(newCheck._id);
+      } else {
+        return res.status(404).json({
+          message: "Не удалось найти счет",
+        });
+      }
 
-    // transaction.set(req.body);
-    // await transaction.save();
+      await transaction.save();
+    }
 
-    // if (oldTransaction.check.toString() !== transaction.check.toString()) {
-    //   const oldCheck = await CheckModel.findById(
-    //     oldTransaction.check.toString()
-    //   );
-    //   const newCheck = await CheckModel.findById(transaction.check.toString());
+    await transaction.save();
 
-    //   if (!newCheck || !oldCheck) {
-    //     return res.status(404).json({
-    //       message: "Не удалось найти счет",
-    //     });
-    //   }
-
-    //   const oldTransactions = oldCheck.transactions[oldTransaction.type];
-    //   const newTransactions = newCheck.transactions[transaction.type];
-
-    //   oldTransactions.findAndRemove(oldTransaction._id);
-    //   newTransactions.push(transaction);
-
-    //   await oldCheck.save();
-    //   await newCheck.save();
-
-    //   updateCheckAmount(oldTransaction.check.toString());
-    //   updateCheckAmount(transaction.check.toString());
-
-    //   return res.json(transaction);
-    // }
-
-    // if (oldTransaction.type !== transaction.type) {
-    //   const check = await CheckModel.findById(transaction.check.toString());
-
-    //   if (!check) {
-    //     return res.status(404).json({
-    //       success: false,
-    //       message: "Не удалось найти счет",
-    //     });
-    //   }
-
-    //   const transactionsIncome = check.transactions.income;
-    //   const transactionsExpense = check.transactions.expense;
-
-    //   if (transaction.type === "expense") {
-    //     transactionsIncome.findAndRemove(transaction._id);
-    //     transactionsExpense.push(transaction);
-    //   } else if (transaction.type === "income") {
-    //     transactionsExpense.findAndRemove(transaction._id);
-    //     transactionsIncome.push(transaction);
-    //   }
-
-    //   await check.save();
-
-    //   updateCheckAmount(check._id.toString());
-
-    //   return res.json(transaction);
-    // }
-
-    // if (oldTransaction.amount !== transaction.amount) {
-    //   const check = await CheckModel.findById(transaction.check.toString());
-
-    //   if (!check) {
-    //     return res.status(404).json({
-    //       success: false,
-    //       message: "Не удалось найти счет",
-    //     });
-    //   }
-
-    //   updateCheckAmount(check._id.toString());
-
-    //   return res.json(transaction);
-    // }
-
-    // return res.json(transaction);
+    res.json(transaction);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось обновить транзакцию");
   }

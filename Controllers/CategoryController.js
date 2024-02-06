@@ -86,24 +86,16 @@ export const update = async (req, res) => {
 
     if (req.body.icon === "null") req.body.icon = null;
 
-    await CategoryModel.findByIdAndUpdate(
-      category._id,
-      {
-        name: req.body.name,
-        type: req.body.type,
-        color: req.body.color,
-        icon: req.body.icon,
-      },
-      { new: true }
-    ).then((data) => {
-      if (!data) {
-        return res.status(404).json({
-          message: "Не удалось найти категорию",
-        });
-      }
-
-      res.json(data);
+    category.set({
+      name: req.body.name,
+      type: req.body.type,
+      color: req.body.color,
+      icon: req.body.icon,
     });
+
+    await category.save();
+
+    res.json(category);
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось обновить категорию");
   }

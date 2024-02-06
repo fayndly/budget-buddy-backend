@@ -27,6 +27,7 @@ export default async function updateCheckAmount(checkId) {
     check.amount = expensesTransactions + incomesTransactions;
     await check.save();
   } catch (err) {
+    console.log(err);
     throw new Error("Не удалось обновить сумму счета");
   }
 }
