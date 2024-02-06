@@ -134,16 +134,10 @@ export const remove = async (req, res) => {
         .json({ message: "У вас не доступа к этому счету" });
     }
 
-    await CheckModel.findByIdAndDelete(check._id).then((data) => {
-      if (!data) {
-        return res.status(404).json({
-          message: "Не удалось найти счет",
-        });
-      }
+    await check.deleteOne();
 
-      res.json({
-        id: data._id,
-      });
+    res.json({
+      id: check._id,
     });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить счет");

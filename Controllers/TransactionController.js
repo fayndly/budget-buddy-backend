@@ -244,64 +244,22 @@ export const remove = async (req, res) => {
         .json({ message: "У вас не доступа к этой транзакции" });
     }
 
-    await TransactionModel.findByIdAndDelete(
-      getFakeId(transaction._id.toString(), false)
-    ).then(async (data) => {
-      if (!data) {
-        return res.status(404).json({
-          message: "Не удалось найти транзакцию",
-        });
-      }
+    const check = await CheckModel.findById(transaction.check.toString());
 
-      const check = await CheckModel.findById(transaction.check.toString());
-
-      if (!check) {
-        return res.json({
-          id: data._id,
-        });
-      }
-
+    if (check) {
       check.transactions[transaction.type].findAndRemove(
         transaction._id.toString()
       );
 
       await check.save();
       updateCheckAmount(check._id.toString());
+    }
 
-      res.json({
-        id: data._id,
-      });
+    await transaction.deleteOne();
+
+    res.json({
+      id: transaction._id,
     });
-
-    // await TransactionModel.deleteOne({
-    //   _id: transaction._id,
-    //   user: transaction.user,
-    // })
-    //   .then(async () => {
-    //     const check = await CheckModel.findById(transaction.check.toString());
-
-    //     if (!check) {
-    //       return res.status(404).json({
-    //         message: "Не удалось найти счет",
-    //       });
-    //     }
-
-    //     check.transactions[transaction.type].findAndRemove(
-    //       transaction._id.toString()
-    //     );
-
-    //     await check.save();
-    //     updateCheckAmount(check._id.toString());
-
-    //     res.json({
-    //       id: transaction._id,
-    //     });
-    //   })
-    //   .catch(() => {
-    //     return res.status(404).json({
-    //       message: "Не удалось найти транзакцию",
-    //     });
-    //   });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить транзакцию");
   }

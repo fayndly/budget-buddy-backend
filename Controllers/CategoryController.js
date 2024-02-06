@@ -123,16 +123,10 @@ export const remove = async (req, res) => {
       });
     }
 
-    await CategoryModel.findByIdAndDelete(category._id).then((data) => {
-      if (!data) {
-        return res.status(404).json({
-          message: "Не удалось найти категорию",
-        });
-      }
+    await category.deleteOne();
 
-      res.json({
-        id: data._id,
-      });
+    res.json({
+      id: category._id,
     });
   } catch (err) {
     serverErrorHandler(res, err, "Не удалось удалить категорию");
