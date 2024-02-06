@@ -1,4 +1,6 @@
 export default function sortByDateInRange(array, startDate, endDate) {
+  startDate = new Date(startDate);
+  endDate = new Date(endDate);
   const filteredArray = array.filter(function (item) {
     const date = new Date(item.time);
     return date >= startDate && date <= endDate;
