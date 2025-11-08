@@ -104,7 +104,7 @@ export const login = async (req, res) => {
 
 export const getCheckMe = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.userId).exec();
+    const user = await UserModel.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({

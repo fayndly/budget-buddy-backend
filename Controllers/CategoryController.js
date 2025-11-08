@@ -63,6 +63,7 @@ export const getAll = async (req, res) => {
 };
 
 export const update = async (req, res) => {
+  // сделать пересчет счетов при изменении типа категории
   try {
     const category = await CategoryModel.findById(req.params.id);
 

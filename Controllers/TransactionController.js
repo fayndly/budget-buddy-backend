@@ -9,7 +9,6 @@ import sortByDateInRange from "../Helpers/SortByDateInRange.js";
 import updateCheckAmount from "../Helpers/UpdateCheckAmount.js";
 
 import { strToBool } from "../Utils/StrtoBool.js";
-import { getFakeId } from "../Utils/GetFakeId.js";
 
 Array.prototype.findAndRemove = function (val) {
   const index = this.indexOf(val);
@@ -69,9 +68,7 @@ export const create = async (req, res) => {
 
 export const getOneById = async (req, res) => {
   try {
-    const transaction = TransactionModel.findById(
-      getFakeId(req.params.id, false)
-    );
+    const transaction = TransactionModel.findById(req.params.id);
 
     if (req.query.populate) {
       const populate = req.query.populate;
@@ -228,9 +225,7 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const transaction = await TransactionModel.findById(
-      getFakeId(req.params.id, false)
-    );
+    const transaction = await TransactionModel.findById(req.params.id);
 
     if (!transaction) {
       return res.status(404).json({
@@ -238,7 +233,7 @@ export const remove = async (req, res) => {
       });
     }
 
-    if (transaction.user.toString() !== getFakeId(req.userId, false)) {
+    if (transaction.user.toString() !== req.userId) {
       return res
         .status(403)
         .json({ message: "У вас не доступа к этой транзакции" });
